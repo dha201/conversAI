@@ -1,8 +1,8 @@
 'use client';
 import React from 'react';
 
-import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
+import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs';
+import { useRouter } from 'next/navigation';
 
 export function TopNav() {
   const router = useRouter();
@@ -23,16 +23,16 @@ export function TopNav() {
 
       <div>
         <SignedOut>
-        <SignInButton>
-          <button className="bg-slate-900 text-white px-4 py-2 rounded hover:bg-slate-950">
-            Sign In
-          </button>
-        </SignInButton>
+          <SignInButton>
+            <button className="bg-slate-900 text-white px-4 py-2 rounded hover:bg-slate-950">
+              Sign In
+            </button>
+          </SignInButton>
         </SignedOut>
         <SignedIn>
           <UserButton />
         </SignedIn>
       </div>
     </nav>
-  )
+  );
 }

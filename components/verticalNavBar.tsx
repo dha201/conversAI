@@ -5,17 +5,34 @@ function VerticalNavbar() {
     <nav className="w-1/6 h-[calc(100vh-4rem)] bg-white text-slate-900 fixed left-0 top-16 pt-4">
       <ul className="flex flex-col space-y-4 p-4 ml-5">
         <li className="hover:bg-gray-200 p-2 rounded flex items-center">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 mr-2">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-6 h-6 mr-2"
+          >
             <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
             <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
             <g id="SVGRepo_iconCarrier">
-              <path d="M4 12H20M12 4V20" stroke="#000000" strokeWidth="2" stroke-linecap="round" stroke-linejoin="round"></path>
+              <path
+                d="M4 12H20M12 4V20"
+                stroke="#000000"
+                strokeWidth="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              ></path>
             </g>
           </svg>
           <a href="#">Create Agent</a>
         </li>
         <li className="hover:bg-gray-200 p-2 rounded flex items-center">
-          <svg fill="#000000" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 mr-2">
+          <svg
+            fill="#000000"
+            viewBox="0 0 32 32"
+            version="1.1"
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-6 h-6 mr-2"
+          >
             <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
             <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
             <g id="SVGRepo_iconCarrier">
