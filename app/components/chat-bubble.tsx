@@ -6,16 +6,16 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@/app/components/ui/card";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion";
+} from "@/app/components/ui/accordion";
 import { Message } from "ai/react";
 import ReactMarkdown from "react-markdown";
-import { formattedText } from "@/utils/utils";
+import { formattedText } from "@/app/utils/utils";
 
 const convertNewLines = (text: string) =>
   text.split("\n").map((line, i) => (

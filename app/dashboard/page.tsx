@@ -1,9 +1,9 @@
 'use client';
 import React from 'react';
-import { TopNav } from '@/components/topNav';
-import VerticalNavbar from '@/components/verticalNavBar';
-import { Chat } from '@/components/chat';
-import { withAuth } from '@/utils/withAuth';
+import { TopNav } from '@/app/components/topNav';
+import VerticalNavbar from '@/app/components/verticalNavBar';
+import { Chat } from '@/app/components/chat';
+import { withAuth } from '@/app/utils/withAuth';
 
 function Page() {
   return (

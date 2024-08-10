@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@clerk/nextjs';
-import CustomSignIn from '@/components/signIn';
+import CustomSignIn from '@/app/components/signIn';
 
 export default function Page(): JSX.Element | null {
   const router = useRouter();

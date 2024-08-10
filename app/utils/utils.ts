@@ -7,7 +7,6 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-
 export function formattedText(inputText: string) {
   return inputText
     .replace(/\n+/g, " ") // Replace multiple consecutive new lines with a single space
@@ -24,4 +23,12 @@ export const initialMessages: Message[] = [
       "Hi! I am your PDF assistant. I am happy to help with your questions about your PDF about German law.",
   },
 ];
+
+/**
+ * Returns a Promise that resolves after a specified number of milliseconds.
+ * Essentially provides a way to retry logic in an asynchronous manner for index creation.
+ */
+export function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
