@@ -1,11 +1,12 @@
 // File: /app/api/summarize/route.ts
 
 import { OpenAI } from 'openai';
+import path from 'path';
 import { JSONLoader } from "langchain/document_loaders/fs/json";
 import { formatDocumentsAsString } from 'langchain/util/document';
 
 const loader = new JSONLoader(
-    "data/states.json",
+    path.resolve(process.cwd(), "data/states.json"), 
     ["/state", "/code", "/nickname", "/website", "/admission_date", "/admission_number", "/capital_city", "/capital_url", "/population", "/population_rank", "/constitution_url", "/twitter_url"],
 );
 

@@ -6,7 +6,7 @@ import {
 import { ChatOpenAI } from '@langchain/openai';
 import { PromptTemplate } from '@langchain/core/prompts';
 import { HttpResponseOutputParser } from 'langchain/output_parsers';
-
+import path from 'path';
 import { JSONLoader } from "langchain/document_loaders/fs/json";
 import { RunnableSequence } from '@langchain/core/runnables'
 import { formatDocumentsAsString } from 'langchain/util/document'; //required for the context to pass into langchain
@@ -15,12 +15,11 @@ import { streamText } from 'ai';
 // import { getPinecone } from '@/app/lib/pinecone-client';
 // import { getVectorStore } from '@/app/lib/vector-store';
 
-
 /**
  * parse specific fields from a JSON file to be used by the AI model to answer questions
  */
 const loader = new JSONLoader(
-    "data/states.json",
+    path.resolve(process.cwd(), "data/states.json"), 
     ["/state", "/code", "/nickname", "/website", "/admission_date", "/admission_number", "/capital_city", "/capital_url", "/population", "/population_rank", "/constitution_url", "/twitter_url"],
 );
 
@@ -72,11 +71,11 @@ export async function POST(req: Request) {
         }
 
         // Load context documents directly from the JSON loader
-        const docs = await loader.load();
-        const context = formatDocumentsAsString(docs);
+        /* const docs = await loader.load();
+        const context = formatDocumentsAsString(docs); */
 
         // Manually load JSON object (this is also commented out as we're testing the loader)
-        /* const textSplitter = new CharacterTextSplitter();
+        const textSplitter = new CharacterTextSplitter();
         const docs = await textSplitter.createDocuments([JSON.stringify({
             "state": "Virginia",
             "slug": "virginia",
@@ -92,7 +91,7 @@ export async function POST(req: Request) {
             "constitution_url": "https://law.lis.virginia.gov/constitution",
             "twitter_url": "https://twitter.com/GovernorVA",
         })]);
-        const context = formatDocumentsAsString(docs); */
+        const context = formatDocumentsAsString(docs);
         
         // const relevantDocs = await vectorStore.asRetriever().invoke(currentMessageContent);
         // const context = relevantDocs.map(doc => doc.pageContent).join("\n");
