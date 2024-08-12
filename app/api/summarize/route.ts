@@ -1,20 +1,32 @@
 // File: /app/api/summarize/route.ts
 
 import { OpenAI } from 'openai';
-import path from 'path';
+import { getVectorStore } from '@/app/lib/vector-store';
+import { getPinecone } from '@/app/lib/pinecone-client';
+/* 
 import { JSONLoader } from "langchain/document_loaders/fs/json";
-import { formatDocumentsAsString } from 'langchain/util/document';
+import { formatDocumentsAsString } from 'langchain/util/document'; 
+import path from 'path';
+*/
 
-const loader = new JSONLoader(
+/* const loader = new JSONLoader(
     path.resolve(process.cwd(), "data/states.json"), 
     ["/state", "/code", "/nickname", "/website", "/admission_date", "/admission_number", "/capital_city", "/capital_url", "/population", "/population_rank", "/constitution_url", "/twitter_url"],
-);
+); */
 
 export async function POST(req: Request) {
     try {
         // Load context documents directly from the JSON loader
-        const docs = await loader.load();
-        const context = formatDocumentsAsString(docs);
+        /* const docs = await loader.load();
+        const context = formatDocumentsAsString(docs); */
+
+        // Initialize Pinecone and Vector Store
+        const pineconeClient = await getPinecone();
+        const vectorStore = await getVectorStore(pineconeClient);
+
+        // Retrieve relevant documents from Pinecone using the user's input
+        const relevantDocs = await vectorStore.asRetriever().invoke("javascript");
+        const context = relevantDocs.map(doc => doc.pageContent).join("\n");
 
         // If context is empty or not available
         if (!context) {

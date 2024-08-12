@@ -13,16 +13,6 @@ export function formattedText(inputText: string) {
     .replace(/\s+/g, " "); // Replace multiple consecutive spaces with a single space
 }
 
-// Default UI Message
-export const initialMessages: Message[] = [
-  {
-    role: "assistant",
-    id: "0",
-    content:
-      "Hi! I am your PDF assistant. I am happy to help with your questions about your PDF about German law.",
-  },
-];
-
 /**
  * Returns a Promise that resolves after a specified number of milliseconds.
  * Essentially provides a way to retry logic in an asynchronous manner for index creation.

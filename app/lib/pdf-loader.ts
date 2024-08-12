@@ -3,9 +3,9 @@ import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { env } from "./config";
 
 // https://js.langchain.com/v0.2/docs/how_to/document_loader_pdf/
-export async function getChunkedDocsFromPDF() {
+export async function getChunkedDocsFromPDF(file: File) {
   try {
-    const loader = new PDFLoader(env.PDF_PATH);
+    const loader = new PDFLoader(file);
     const docs = await loader.load();
 
     // From the docs https://www.pinecone.io/learn/chunking-strategies/

@@ -6,6 +6,7 @@ import { Button } from "./ui/button";
 import { useChat } from "ai/react";
 import { ChatBubble } from "./chat-bubble";
 import { Message } from "ai/react";
+import PDFUploader from "./PDFUploader";
 
 interface ChatProps {
   input: string;
@@ -22,6 +23,7 @@ const Chat: React.FC<ChatProps> = ({
 }) => {
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const [summary, setSummary] = useState<string>('');
+  const apiCallMade = useRef(false);
 
   useEffect(() => {
     if (chatContainerRef.current) {
@@ -31,6 +33,9 @@ const Chat: React.FC<ChatProps> = ({
 
   useEffect(() => {
     const fetchSummary = async () => {
+      if (apiCallMade.current) return;
+      apiCallMade.current = true;
+
       try {
         const response = await fetch('/api/summarize', {
           method: 'POST',
@@ -39,11 +44,13 @@ const Chat: React.FC<ChatProps> = ({
           },
           body: JSON.stringify({}),
         });
+
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
+
         const data = await response.json();
-        setSummary(data.summary);
+        setSummary(data.introduction || data.summary);
       } catch (error) {
         console.error('Error fetching summary:', error);
       }
@@ -73,24 +80,25 @@ const Chat: React.FC<ChatProps> = ({
         </ul>
       </div>
 
-      <form onSubmit={handleMessageSubmit} className="p-4 flex">
-        <Input
-          placeholder={"Type to chat with AI..."}
-          className="mr-2"
-          value={input}
-          onChange={handleInputChange}
-        />
-        <Button type="submit" className="w-24">
-          Ask
-        </Button>
-      </form>
+      <div className="p-4 flex">
+        <PDFUploader />
+        <form onSubmit={handleMessageSubmit} className="flex flex-grow">
+          <Input
+            placeholder={"Type to chat with AI..."}
+            className="mr-2 flex-grow"
+            value={input}
+            onChange={handleInputChange}
+          />
+          <Button type="submit" className="w-24">
+            Ask
+          </Button>
+        </form>
+      </div>
     </div>
   );
 };
 
 export default function ChatContainer() {
-  // The useChat hook from ai sdk will automatically handle this streaming response.
-  // Ref: https://sdk.vercel.ai/docs/reference/ai-sdk-ui/use-chat#api-signature
   const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
     streamProtocol: 'text',
     api: '/api/chat',
@@ -105,7 +113,6 @@ export default function ChatContainer() {
     },
   });
 
-  // triggers the API request
   const handleMessageSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     handleSubmit();

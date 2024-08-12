@@ -12,16 +12,16 @@ import { RunnableSequence } from '@langchain/core/runnables'
 import { formatDocumentsAsString } from 'langchain/util/document'; //required for the context to pass into langchain
 import { CharacterTextSplitter } from 'langchain/text_splitter'; // Used with JSON Object
 import { streamText } from 'ai';
-// import { getPinecone } from '@/app/lib/pinecone-client';
-// import { getVectorStore } from '@/app/lib/vector-store';
+import { getPinecone } from '@/app/lib/pinecone-client';
+import { getVectorStore } from '@/app/lib/vector-store';
 
 /**
  * parse specific fields from a JSON file to be used by the AI model to answer questions
  */
-const loader = new JSONLoader(
+/* const loader = new JSONLoader(
     path.resolve(process.cwd(), "data/states.json"), 
     ["/state", "/code", "/nickname", "/website", "/admission_date", "/admission_number", "/capital_city", "/capital_url", "/population", "/population_rank", "/constitution_url", "/twitter_url"],
-);
+); */
 
 /**
  * treat this API route as dynamic, ensuring that it doesn't get cached statically.
@@ -36,7 +36,7 @@ const formatMessage = (message: VercelChatMessage) => {
     return `${message.role}: ${message.content}`;
 };
 
-const TEMPLATE = `Answer the user's questions based only on the following context. If the answer is not in the context, reply politely that you do not have that information available.:
+const TEMPLATE = `Answer the user's questions based only on the following context:
 ==============================
 Context: {context}
 ==============================
@@ -48,8 +48,8 @@ assistant:`;
 
 export async function POST(req: Request) {
     try {
-        // const pineconeClient = await getPinecone();
-        // const vectorStore = await getVectorStore(pineconeClient);
+        const pineconeClient = await getPinecone();
+        const vectorStore = await getVectorStore(pineconeClient);
 
         /**
          * Extracts chat messages from the request body, formats the history, and isolates the latest user message as input data for the AI model
@@ -71,8 +71,8 @@ export async function POST(req: Request) {
         }
 
         // Load context documents directly from the JSON loader
-        const docs = await loader.load();
-        const context = formatDocumentsAsString(docs);
+        /* const docs = await loader.load();
+        const context = formatDocumentsAsString(docs); */
 
         // Manually load JSON object (this is also commented out as we're testing the loader)
         /* const textSplitter = new CharacterTextSplitter();
@@ -93,14 +93,17 @@ export async function POST(req: Request) {
         })]);
         const context = formatDocumentsAsString(docs); */
         
-        // const relevantDocs = await vectorStore.asRetriever().invoke(currentMessageContent);
-        // const context = relevantDocs.map(doc => doc.pageContent).join("\n");
+        // Retrieve relevant documents from Pinecone using the current message content
+        const relevantDocs = await vectorStore.asRetriever().invoke(currentMessageContent);
+        console.log("Retrieved documents from Pinecone:", relevantDocs);
+        const context = relevantDocs.map(doc => doc.pageContent).join("\n");
+        console.log("Concatenated context:", context);
 
         const prompt = PromptTemplate.fromTemplate(TEMPLATE);
         const model = new ChatOpenAI({
             apiKey: process.env.OPENAI_API_KEY!,
-            model: 'gpt-3.5-turbo',
-            temperature: 0,
+            model: 'gpt-4o-mini',
+            temperature: 0.7,
             streaming: true,
             verbose: true,
         });

@@ -1,4 +1,4 @@
-import { getChunkedDocsFromPDF } from "@/app/lib/pdf-loader";
+/* import { getChunkedDocsFromPDF } from "@/app/lib/pdf-loader";
 import { embedAndStoreDocs } from "@/app/lib/vector-store";
 import { getPinecone } from "@/app/lib/pinecone-client";
 
@@ -20,3 +20,4 @@ import { getPinecone } from "@/app/lib/pinecone-client";
     console.error("Init client script failed ", error);
   }
 })();
+ */
