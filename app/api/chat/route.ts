@@ -71,11 +71,11 @@ export async function POST(req: Request) {
         }
 
         // Load context documents directly from the JSON loader
-        /* const docs = await loader.load();
-        const context = formatDocumentsAsString(docs); */
+        const docs = await loader.load();
+        const context = formatDocumentsAsString(docs);
 
         // Manually load JSON object (this is also commented out as we're testing the loader)
-        const textSplitter = new CharacterTextSplitter();
+        /* const textSplitter = new CharacterTextSplitter();
         const docs = await textSplitter.createDocuments([JSON.stringify({
             "state": "Virginia",
             "slug": "virginia",
@@ -91,7 +91,7 @@ export async function POST(req: Request) {
             "constitution_url": "https://law.lis.virginia.gov/constitution",
             "twitter_url": "https://twitter.com/GovernorVA",
         })]);
-        const context = formatDocumentsAsString(docs);
+        const context = formatDocumentsAsString(docs); */
         
         // const relevantDocs = await vectorStore.asRetriever().invoke(currentMessageContent);
         // const context = relevantDocs.map(doc => doc.pageContent).join("\n");
