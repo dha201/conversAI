@@ -1,12 +1,23 @@
 // File: /app/api/summarize/route.ts
 
 import { OpenAI } from 'openai';
+import { JSONLoader } from "langchain/document_loaders/fs/json";
+import { formatDocumentsAsString } from 'langchain/util/document';
+
+const loader = new JSONLoader(
+    "data/states.json",
+    ["/state", "/code", "/nickname", "/website", "/admission_date", "/admission_number", "/capital_city", "/capital_url", "/population", "/population_rank", "/constitution_url", "/twitter_url"],
+);
 
 export async function POST(req: Request) {
     try {
-        const { context } = await req.json();
-        if (typeof context !== 'string') {
-            throw new Error('Invalid context format');
+        // Load context documents directly from the JSON loader
+        const docs = await loader.load();
+        const context = formatDocumentsAsString(docs);
+
+        // If context is empty or not available
+        if (!context) {
+            throw new Error('Failed to load context data');
         }
 
         const openai = new OpenAI({
@@ -27,12 +38,11 @@ export async function POST(req: Request) {
             ],
             temperature: 0.7,
         });
+
         console.log('OpenAI response:', response);
 
         const summary = response.choices[0].message?.content?.trim() || '';
         console.log('Generated summary:', summary);
-
-        console.log('Sending response:', { summary });
 
         return new Response(JSON.stringify({ summary }), {
             headers: { 'Content-Type': 'application/json' },

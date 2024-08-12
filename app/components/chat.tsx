@@ -1,10 +1,10 @@
 'use client'
 
-import React, { FormEvent, ChangeEvent, useRef, useEffect } from "react";
+import React, { FormEvent, ChangeEvent, useRef, useEffect, useState } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { useChat } from "ai/react";
-import { ChatBubble } from "./chat-bubble"; // Adjust the import path if needed
+import { ChatBubble } from "./chat-bubble";
 import { Message } from "ai/react";
 
 interface ChatProps {
@@ -21,6 +21,7 @@ const Chat: React.FC<ChatProps> = ({
   messages,
 }) => {
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const [summary, setSummary] = useState<string>('');
 
   useEffect(() => {
     if (chatContainerRef.current) {
@@ -28,12 +29,41 @@ const Chat: React.FC<ChatProps> = ({
     }
   }, [messages]);
 
+  useEffect(() => {
+    const fetchSummary = async () => {
+      try {
+        const response = await fetch('/api/summarize', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({}),
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setSummary(data.summary);
+      } catch (error) {
+        console.error('Error fetching summary:', error);
+      }
+    };
+
+    fetchSummary();
+  }, []);
+
   return (
     <div className="rounded-2xl border h-[75vh] flex flex-col justify-between">
       <div
         className="p-6 overflow-y-auto flex-grow flex flex-col gap-4"
         ref={chatContainerRef}
       >
+        {summary && (
+          <ChatBubble
+            role="assistant"
+            content={`Hello! Here's a summary of what I know so far:\n\n${summary}\n\nHow can I assist you today?`}
+          />
+        )}
         <ul className="flex flex-col gap-4">
           {messages.map(({ id, role, content }: Message) => (
             <li key={id}>
