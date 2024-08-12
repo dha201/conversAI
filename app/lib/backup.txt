@@ -1,0 +1,98 @@
+import { getVectorStore } from "./vector-store"; // retriever
+import { getPinecone } from "./pinecone-client"; // for connecting to pinecone and inverting indexes
+import { ConversationalRetrievalQAChain } from "langchain/chains";
+import {
+  streamText, // handle the streaming of responses from the language model.
+  StreamData, // handle data to stream alongside the model’s response
+  LangChainAdapter, // converting the output from LangChain into a format that can be streamed.
+} from "ai";
+import { ChatOpenAI } from "@langchain/openai";
+
+// Input: The function takes a question and chat history as input.
+type callChainArgs = {
+  question: string;
+  chatHistory: string;
+};
+
+export async function callChain({ question, chatHistory }: callChainArgs) {
+  try {
+    // Sanitization: The question is sanitized to remove unnecessary characters.
+    const sanitizedQuestion = question.trim().replaceAll("\n", " "); // Trims and replaces newline characters in the question to ensure it is in a clean format.
+
+    // Setup: Initializes clients and stores (Pinecone and vector store).
+    const pineconeClient = await getPinecone();
+    const vectorStore = await getVectorStore(pineconeClient);
+
+    // Streaming: Sets up streaming components to handle real-time data.
+    /* const { stream, handlers } = LangChainStream({
+      experimental_streamData: true,
+    });
+    const data = new experimental_StreamData(); */
+
+    const streamingModel = new ChatOpenAI({
+      modelName: "gpt-3.5-turbo",
+      streaming: true,
+      verbose: true,
+      temperature: 0,
+    });
+
+    const nonStreamingModel = new ChatOpenAI({
+      modelName: "gpt-3.5-turbo",
+      verbose: true,
+      temperature: 0,
+    });
+
+    // Define the templates directly
+    const STANDALONE_QUESTION = `Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.
+
+    Chat History:
+    {chat_history}
+    Follow Up Input: {question}
+    Standalone question:`;
+
+    const SYSTEM_MESSAGE  = `You are an enthusiastic AI assistant. Use the following pieces of context to answer the question at the end.
+    If you don't know the answer, just say you don't know. DO NOT try to make up an answer.
+    If the question is not related to the context, politely respond that you are tuned to only answer questions that are related to the context.
+
+    {context}
+
+    Question: {question}
+    Helpful answer in markdown:`;
+
+    const data = new StreamData();
+
+    data.append({ test: 'value' }); // Append additional data (if any)
+
+    // Create the chain
+    const chain = ConversationalRetrievalQAChain.fromLLM(
+      streamingModel,
+      vectorStore.asRetriever(),
+      {
+        qaTemplate: SYSTEM_MESSAGE,
+        questionGeneratorTemplate: STANDALONE_QUESTION,
+        returnSourceDocuments: true,
+        questionGeneratorChainOptions: {
+          llm: nonStreamingModel,
+        },
+      }
+    );
+
+    // Call the chain and handle the response
+    const stream = await chain.stream({
+      question: sanitizedQuestion,
+      chat_history: chatHistory,
+    });
+
+    // Ensure the data is sent when the stream finishes
+    stream.onFinish(() => {
+      data.close();
+    });
+
+    return LangChainAdapter.toDataStreamResponse(stream, { data }); // Note data; it is an optional parameter that can be used to send additional data to the model.
+
+    
+  } catch (e) {
+    console.error(e);
+    throw new Error("Call chain method failed to execute successfully!!");
+  }
+}

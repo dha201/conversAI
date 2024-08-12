@@ -1,9 +1,9 @@
-'use client';
+'use client'
 import React from 'react';
 import { TopNav } from '@/app/components/topNav';
 import VerticalNavbar from '@/app/components/verticalNavBar';
-import { Chat } from '@/app/components/chat';
-import { withAuth } from '@/app/utils/withAuth';
+import Chat from '../components/chat';
+import { withAuth } from '@/app/utils/withAuth'; 
 
 function Page() {
   return (
@@ -20,4 +20,5 @@ function Page() {
   );
 }
 
+// Wrap the Page component with the withAuth HOC to ensure that only authenticated users can access the page
 export default withAuth(Page);

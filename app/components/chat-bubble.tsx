@@ -2,20 +2,10 @@ import Balancer from "react-wrap-balancer";
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/app/components/ui/card";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/app/components/ui/accordion";
 import { Message } from "ai/react";
-import ReactMarkdown from "react-markdown";
-import { formattedText } from "@/app/utils/utils";
 
 const convertNewLines = (text: string) =>
   text.split("\n").map((line, i) => (
@@ -25,14 +15,11 @@ const convertNewLines = (text: string) =>
     </span>
   ));
 
-interface ChatBubbleProps extends Partial<Message> {
-  sources: string[];
-}
+interface ChatBubbleProps extends Partial<Message> {}
 
 export function ChatBubble({
   role = "assistant",
   content,
-  sources,
 }: ChatBubbleProps) {
   if (!content) {
     return null;
@@ -60,32 +47,6 @@ export function ChatBubble({
         <CardContent className="text-sm">
           <Balancer>{formattedMessage}</Balancer>
         </CardContent>
-
-        {/* Footer section containing an accordion of sources, if provided */}
-        <CardFooter>
-          <CardDescription className="w-full">
-            {sources && sources.length ? (
-              <Accordion type="single" collapsible className="w-full">
-                {sources.map((source, index) => (
-                  <AccordionItem value={`source-${index}`} key={index}>
-                    <AccordionTrigger>{`Source ${index + 1}`}</AccordionTrigger>
-                    <AccordionContent>
-                      <ReactMarkdown 
-                        components={{
-                          a: ({node, ...props}) => <a target="_blank" rel="noopener noreferrer" {...props} />
-                        }}
-                      >
-                        {formattedText(source)}
-                      </ReactMarkdown>
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
-            ) : (
-              <></>
-            )}
-          </CardDescription>
-        </CardFooter>
       </Card>
     </div>
   );

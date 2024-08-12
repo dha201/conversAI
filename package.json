@@ -11,6 +11,7 @@
     "prepare:data": "tsx -r dotenv/config ./app/scripts/pinecone-embed-docs.ts"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^0.0.44",
     "@clerk/nextjs": "^5.3.0",
     "@langchain/community": "^0.2.25",
     "@langchain/pinecone": "^0.0.8",

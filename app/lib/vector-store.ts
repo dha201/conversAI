@@ -16,7 +16,7 @@ export async function embedAndStoreDocs(
     //embed the PDF documents
     await PineconeStore.fromDocuments(docs, embeddings, {
       pineconeIndex: index,
-      textKey: 'text',
+      textKey: 'text',  
     });
   } catch (error) {
     console.log('error ', error);
@@ -31,9 +31,10 @@ export async function getVectorStore(client: Pinecone) {
     const embeddings = new OpenAIEmbeddings();
     const index = client.Index(env.PINECONE_INDEX_NAME);
 
+    // Getting Index from Pinecone
     const vectorStore = await PineconeStore.fromExistingIndex(embeddings, {
       pineconeIndex: index,
-      textKey: 'text',
+      textKey: 'text', // same metadata key from embedding the PDF which can also be used during retrieving the information from pinecone. Referred to https://docs.pinecone.io/guides/data/filter-with-metadata
     });
 
     return vectorStore;
