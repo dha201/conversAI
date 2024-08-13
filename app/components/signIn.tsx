@@ -25,8 +25,10 @@ export default function CustomSignIn(): JSX.Element | null {
     <div className="min-h-screen flex items-center justify-center  py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Welcome to XYZ</h2>
-          <p className="mt-2 text-center text-sm text-gray-600">tag line</p>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Welcome to ConversAI</h2>
+          <p className="mt-2 text-center text-sm text-gray-600">
+            Here you can chat with our AI assistant, Sign in to get started!
+          </p>
         </div>
         <div>
           <button

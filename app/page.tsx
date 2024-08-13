@@ -2,6 +2,8 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@clerk/nextjs';
+import Image from 'next/image';
+import Icon from '@/data/icon.png';
 
 export default function Home() {
   const router = useRouter();
@@ -18,8 +20,12 @@ export default function Home() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center gap-12">
-      If you are seeing this page rendered, THERE IS SOMETHING WRONG!
+    <div className="relative flex min-h-screen items-center justify-center gap-12">
+      <div className="absolute top-4 left-4">
+        <Image src={Icon} alt="Site Logo" width={150} height={150} />
+      </div>
+      <div>
+      </div>
     </div>
   );
 }

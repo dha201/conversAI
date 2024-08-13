@@ -38,18 +38,18 @@ export async function POST(req: Request) {
         });
 
         const response = await openai.chat.completions.create({
-            model: 'gpt-3.5-turbo',
+            model: 'gpt-4o-mini',
             messages: [
                 {
                     role: 'system',
-                    content: 'You are a helpful assistant that summarizes large texts.',
+                    content: 'You are a helpful assistant that summarizes large texts. Your job is to Fill in the blank Hello! I am here to help you with [context]',
                 },
                 {
                     role: 'user',
-                    content: `Please summarize the following context:\n\n${context}`,
+                    content: `Here is the context: ${context}`,
                 },
             ],
-            temperature: 0.7,
+            temperature: 0.9,
         });
 
         console.log('OpenAI response:', response);

@@ -95,15 +95,14 @@ export async function POST(req: Request) {
         
         // Retrieve relevant documents from Pinecone using the current message content
         const relevantDocs = await vectorStore.asRetriever().invoke(currentMessageContent);
-        console.log("Retrieved documents from Pinecone:", relevantDocs);
+        console.log("Succesfully retrieved documents from Pinecone!");
         const context = relevantDocs.map(doc => doc.pageContent).join("\n");
-        console.log("Concatenated context:", context);
 
         const prompt = PromptTemplate.fromTemplate(TEMPLATE);
         const model = new ChatOpenAI({
             apiKey: process.env.OPENAI_API_KEY!,
             model: 'gpt-4o-mini',
-            temperature: 0.7,
+            temperature: 0.9,
             streaming: true,
             verbose: true,
         });
