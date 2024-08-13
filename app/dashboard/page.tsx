@@ -6,6 +6,8 @@ import { withAuth } from '@/app/utils/withAuth';
 import { useAuth } from '@clerk/nextjs';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
+import { Toaster } from "@/app/components/ui/toaster"
+
 
 function Page() {
   const [conversationId, setConversationId] = useState<string | null>(null);
@@ -91,6 +93,7 @@ function Page() {
   return (
     <div className="flex flex-col h-screen">
       <TopNav />
+      <Toaster />
       <div className="flex flex-1 overflow-hidden pt-16">
         <nav className="w-1/6 h-[calc(100vh-4rem)] bg-white text-slate-900 fixed left-0 top-16 pt-4">
           <ul className="flex flex-col space-y-4 p-4 ml-5">

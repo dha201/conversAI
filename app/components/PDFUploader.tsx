@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { toast } from "@/app/components/ui/use-toast";
 
 const PDFUploader: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -26,9 +27,19 @@ const PDFUploader: React.FC = () => {
         if (response.ok) {
           console.log('PDF uploaded and embedded successfully');
           // You can add additional logic here, like updating the chat context
+          toast({
+            title: "Upload Successful",
+            description: "Knowledge base updated. The AI is now equipped to handle queries about your uploaded document.",
+            variant: "default",
+          });
         }
       } catch (error) {
         console.error('Error uploading and embedding PDF:', error);
+        toast({
+          title: "Upload Failed",
+          description: "There was an error uploading your PDF.",
+          variant: "destructive",
+        });
       } finally {
         setIsLoading(false);
       }
