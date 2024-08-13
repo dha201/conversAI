@@ -4,14 +4,16 @@ import { getChunkedDocsFromPDF } from '../../lib/pdf-loader';
 import { embedAndStoreDocs } from '../../lib/vector-store';
 
 export async function POST(request: Request) {
-  const formData = await request.formData();
-  const file = formData.get('pdf') as File;
-
-  if (!file) {
-    return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
-  }
-
   try {
+    const formData = await request.formData();
+    
+    const fileEntry = formData.get('pdf');
+    if (!fileEntry || !(fileEntry instanceof File)) {
+      return NextResponse.json({ error: 'No file uploaded or invalid file type' }, { status: 400 });
+    }
+
+    const file = fileEntry as File;
+
     const pineconeClient = await getPinecone();
     const chunks = await getChunkedDocsFromPDF(file);
     await embedAndStoreDocs(pineconeClient, chunks);
