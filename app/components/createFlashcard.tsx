@@ -61,15 +61,6 @@ const CreateFlashcard = () => {
     return (
         <div className="h-full p-6 overflow-y-auto flex-grow flex flex-col gap-4 items-center justify-center bg-slate-50">
             <div className="w-11/12 max-w-2xl p-8 bg-white rounded-lg shadow-lg">
-                {/* Recreate the stepper for create -> type-choice https://primereact.org/stepper/ */}
-                <div className="flex justify-around mb-8">
-                <button className="px-4 py-2 text-lg font-medium bg-gray-200 rounded hover:bg-gray-300">
-                    Create
-                </button>
-                <button className="px-4 py-2 text-lg font-medium bg-gray-200 rounded hover:bg-gray-300">
-                    Source
-                </button>
-                </div>
 
                 <p className="mb-8 text-sm text-gray-600">
                 The security and confidentiality of your data is our priority and we guarantee that no AI model will be trained with your data.

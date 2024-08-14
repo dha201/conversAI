@@ -80,7 +80,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   };
 
   const handleCreateFlashcardClick = () => {
-    router.push('/dashboard/create');
+    router.push(`/dashboard/create?userId=${userId}`);
   };
 
   return (
