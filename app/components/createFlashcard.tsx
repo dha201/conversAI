@@ -2,7 +2,11 @@ import React, { useState, useRef } from 'react';
 import Image from 'next/image';
 import { toast } from "@/app/components/ui/use-toast";
 
-const CreateFlashcard = () => {
+interface CreateFlashcardProps {
+    deckName: string | null; 
+}
+
+const CreateFlashcard = ({ deckName }: CreateFlashcardProps) => {
     const [selectedInput, setSelectedInput] = useState<'link' | 'document' | 'text'>('link');
     const [file, setFile] = useState<File | null>(null);
     const [isLoading, setIsLoading] = useState(false);

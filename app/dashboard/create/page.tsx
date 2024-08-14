@@ -10,6 +10,7 @@ export default function CreateFlashcardPage() {
   const [activeStep, setActiveStep] = useState(0);
   const [userId, setUserId] = useState<string | null>(null);
   const searchParams = useSearchParams();
+  const [deckName, setDeckName] = useState<string | null>(null);
 
   useEffect(() => {
     const userIdFromUrl = searchParams.get('userId');
@@ -22,8 +23,8 @@ export default function CreateFlashcardPage() {
       <div className="w-11/12 max-w-2xl p-8 bg-white rounded-lg shadow-lg">
         <Stepper activeStep={activeStep} setActiveStep={setActiveStep} />
 
-        {activeStep === 0 && <CreateStep userId={userId} />}
-        {activeStep === 1 && <CreateFlashcard />}
+        {activeStep === 0 && <CreateStep userId={userId} setDeckName={setDeckName} />} 
+        {activeStep === 1 && <CreateFlashcard deckName={deckName} />}
       </div>
     </div>
   );
