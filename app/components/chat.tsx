@@ -165,7 +165,14 @@ interface ChatContainerProps {
 export default function ChatContainer({ conversationId }: ChatContainerProps) {
   const { getToken, userId } = useAuth();
 
-  const { messages, input: chatInput, handleInputChange, handleSubmit, isLoading } = useChat({ //https://sdk.vercel.ai/docs/reference/ai-sdk-ui/use-chat
+  const { 
+    messages, 
+    input: chatInput, 
+    handleInputChange, 
+    handleSubmit, 
+    isLoading, 
+    setMessages  // This is necessary to manually clear messages
+  } = useChat({ 
     streamProtocol: 'text',
     api: '/api/chat',
     onResponse: (response) => {
@@ -201,6 +208,13 @@ export default function ChatContainer({ conversationId }: ChatContainerProps) {
       console.error('Error during chat submission:', error);
     },
   });
+
+  useEffect(() => {
+    // Whenever conversationId changes, clear the message history
+    if (conversationId) {
+      setMessages([]); // Clear messages
+    }
+  }, [conversationId, setMessages]);
 
   const handleMessageSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();

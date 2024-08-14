@@ -98,6 +98,7 @@ export async function POST(req: Request) {
         console.log("Succesfully retrieved documents from Pinecone!");
         const context = relevantDocs.map(doc => doc.pageContent).join("\n");
 
+
         const prompt = PromptTemplate.fromTemplate(TEMPLATE);
         const model = new ChatOpenAI({
             apiKey: process.env.OPENAI_API_KEY!,
@@ -125,7 +126,6 @@ export async function POST(req: Request) {
             model,
             parser,
         ]);
-
         // Convert the response into real-time streaming of the AI's response to the user
         const stream = await chain.stream({
             chat_history: formattedPreviousMessages.join('\n'),

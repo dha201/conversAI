@@ -8,6 +8,7 @@ export async function GET(request: Request) {
     const url = new URL(request.url);
     const userId = url.searchParams.get('userId');
     const conversationId = url.searchParams.get('conversationId');
+    
     console.log('userId:', userId);
     console.log('conversationId:', conversationId);
 
