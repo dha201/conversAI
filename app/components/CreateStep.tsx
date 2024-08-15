@@ -11,9 +11,10 @@ const colors = [
 interface CreateStepProps {
   userId: string | null;
   setDeckName: (name: string) => void;
+  setActiveStep: (step: number) => void;
 }
 
-export default function CreateStep({ userId, setDeckName  }: CreateStepProps) {
+export default function CreateStep({ userId, setDeckName, setActiveStep  }: CreateStepProps) {
   const [selectedColor, setSelectedColor] = useState(colors[0]);
   const [deckName, setDeckNameLocal] = useState("");
   const [description, setDescription] = useState("");
@@ -55,7 +56,8 @@ export default function CreateStep({ userId, setDeckName  }: CreateStepProps) {
 
       if (response.ok) {
         console.log('Deck created successfully:', result.flashcardId);
-        setDeckName(deckName); // Pass the deck name to the parent component
+        setDeckName(deckName); // Pass the deck name to the parent component\
+        setActiveStep(1); // Move to the next step
       } else {
         setError(result.error || 'Failed to create deck.');
       }
