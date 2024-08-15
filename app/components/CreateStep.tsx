@@ -33,18 +33,24 @@ export default function CreateStep({ userId, setDeckName  }: CreateStepProps) {
       return;
     }
 
+    console.log('User ID:', userId);
+    console.log('Deck Name:', deckName);
+    console.log('Selected Color:', selectedColor.name);
+    console.log('Description:', description);
+
     try {
       const response = await fetch('/api/createDeck', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'userID': userId,
-          'deckName': deckName,
-          'color': selectedColor.name,
-          'description': description,
         },
+        body: JSON.stringify({
+          userId: userId,
+          deckName: deckName,
+          color: selectedColor.name,
+          description: description,
+        }),
       });
-
       const result = await response.json();
 
       if (response.ok) {

@@ -4,17 +4,19 @@ import { MongoClient } from 'mongodb';
 const uri = process.env.MONGODB_URI as string;
 const client = new MongoClient(uri);
 
-export async function GET(request: Request) {
-    const userId = request.headers.get('userID');
-    const deckName = request.headers.get('deckName');
-    const color = request.headers.get('color');
-    const description = request.headers.get('description');
-
-    if (!userId || !deckName || !color || !description) {
-        return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
-    }
-
+export async function POST(request: Request) {
     try {
+        const { userId, deckName, color, description } = await request.json(); 
+        console.log('Full request body:', JSON.stringify(request.body, null, 2));
+
+        if (!userId || !deckName || !color || !description) {
+            return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+        }
+
+        if (!userId || !deckName || !color || !description) {
+            return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+        }
+
         await client.connect();
         const database = client.db('flashcardDB');
         const collection = database.collection('decks');
