@@ -21,6 +21,9 @@ const CreateFlashcard = ({ deckName, userId }: CreateFlashcardProps) => {
         setSelectedInput(type);
     };
 
+    /**
+     * Handle filtering of input type and call the appropriate function to generate content
+     */
     const handleGenerateContent = () => {
         if (selectedInput === 'document' && file) {
             handleGenerateKeywords(file, deckName, userId);
@@ -33,6 +36,14 @@ const CreateFlashcard = ({ deckName, userId }: CreateFlashcardProps) => {
         }
     };
 
+    /**
+     * Need better name for this function
+     * 
+     * Generate keywords from user's provided content
+     * Use the list of keywords to retrieve relevant information from the knowledge base.
+     * Pass in context to OpenAI to generate a list of flashcard questions and answers.
+     * Store it in the mongoDB for later retrieval. 
+     */
     const handleGenerateKeywords = async (input: File | string, deckName: string, userId: string) => {
         const formData = new FormData();
     
@@ -75,6 +86,9 @@ const CreateFlashcard = ({ deckName, userId }: CreateFlashcardProps) => {
         // Handle link submission logic here
     };
 
+    /**
+     * Embeds the provided content into the knowledge base (Pinecone)
+     */
     const handleUpload = async (input: string | File) => {
         setIsLoading(true);
         const formData = new FormData();
@@ -128,6 +142,9 @@ const CreateFlashcard = ({ deckName, userId }: CreateFlashcardProps) => {
         }
     };
 
+    /**
+     * Only For File Upload: Automatically call handleUpload once a file is selected
+     */
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
           setFile(e.target.files[0]);
