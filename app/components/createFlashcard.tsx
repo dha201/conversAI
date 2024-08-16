@@ -4,8 +4,8 @@ import { toast } from "@/app/components/ui/use-toast";
 import { text } from 'stream/consumers';
 
 interface CreateFlashcardProps {
-    deckName: string | null; 
-    userId: string | null;
+    deckName: string ; 
+    userId: string;
 }
 
 const CreateFlashcard = ({ deckName, userId }: CreateFlashcardProps) => {
@@ -23,13 +23,13 @@ const CreateFlashcard = ({ deckName, userId }: CreateFlashcardProps) => {
 
     const handleGenerateContent = () => {
         if (selectedInput === 'document' && file) {
-            handleGenerateKeywords(file, deckName ?? '', userId ?? '');
+            handleGenerateKeywords(file, deckName, userId);
         } else if (selectedInput === 'text') {
             console.log('Text Input:', textInput && textInput);
             handleUpload(textInput);
-            handleGenerateKeywords(textInput, deckName ?? '', userId ?? '');
+            handleGenerateKeywords(textInput, deckName, userId);
         } else if (selectedInput === 'link') {
-            handleGenerateKeywords(selectedInput, deckName ?? '', userId ?? '');
+            handleGenerateKeywords(selectedInput, deckName, userId);
         }
     };
 

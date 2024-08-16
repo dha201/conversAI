@@ -9,18 +9,18 @@ import { getChunkedDocsFromPDF, getChunkedDocsFromText } from '@/app/lib/doc-loa
 const uri = process.env.MONGODB_URI as string;
 const client = new MongoClient(uri);
 
-// Define the Flashcard interface
+// Flashcard interface
 interface Flashcard {
     front: string;
     back: string;
 }
 
-// Define the DeckDocument interface that includes flashcards as an array of Flashcard
+// DeckDocument interface that includes flashcards as an array of Flashcard
 interface DeckDocument {
     userId: string;
     flashcardId: string;
     updatedAt: Date;
-    flashcards: Flashcard[];
+    flashcards: Flashcard[] | Record<string, Flashcard[]>;  // Allow either array or object format
 }
 
 export async function POST(req: Request) {
@@ -65,7 +65,7 @@ export async function POST(req: Request) {
             messages: [
                 {
                     role: 'system',
-                    content: 'You are a helpful assistant that generates keywords',
+                    content: 'You are a helpful assistant that generates keywords. Only provide the keywords and nothing else',
                 },
                 {
                     role: 'user',
@@ -78,14 +78,11 @@ export async function POST(req: Request) {
         const summaryOrKeywords = keywords.choices[0].message?.content?.trim() || '';
         console.log('Generated summary/keywords:', summaryOrKeywords);
 
-        // Initialize Pinecone and Vector Store
+        // Initialize Pinecone and Vector Store, then extract relevant data
         const pineconeClient = await getPinecone();
         const vectorStore = await getVectorStore(pineconeClient);
-
         const relevantDocs = await vectorStore.asRetriever().invoke(summaryOrKeywords);
         const context = relevantDocs.map(doc => doc.pageContent).join("\n");
-
-        // If context is empty or not available
         if (!context) {
             throw new Error('Failed to load context data');
         }
@@ -118,41 +115,49 @@ export async function POST(req: Request) {
                 },
                 {
                     role: 'user',
-                    content: `Here is the context: ${context}`,
+                    content: `Here is the context: ${context}. `,
                 },
             ],
             temperature: 0.9,
         });
 
         const flashcardsJson = response.choices[0].message?.content?.trim();
-
         if (!flashcardsJson) {
             return NextResponse.json({ error: 'Failed to generate flashcards' }, { status: 500 });
         }
+        console.log('Generated flashcards JSON:', flashcardsJson);
+        // Parse JSON to check if it's valid
+        let flashcardsObject: Record<string, Flashcard[]>;
+        try {
+            flashcardsObject = JSON.parse(flashcardsJson);
+        } catch (error) {
+            return NextResponse.json({ error: 'Failed to parse flashcards JSON' }, { status: 500 });
+        }
+
 
         // Parse the generated flashcards JSON
-        let flashcards: Flashcard[];
+        /* let flashcards: Flashcard[];
         try {
             flashcards = JSON.parse(flashcardsJson);
         } catch (error) {
             return NextResponse.json({ error: 'Failed to parse flashcards JSON' }, { status: 500 });
-        }
+        } */
 
         await client.connect();
         const database = client.db('flashcardDB');
         const collection = database.collection<DeckDocument>('decks');
 
-        // Define the update filter with the correct typing
-        const updateFilter: UpdateFilter<DeckDocument> = {
-            $set: { updatedAt: new Date() },
-            $push: { flashcards: { $each: flashcards } }  // Ensure flashcards is treated as an array
-        };
-
         // Update the existing deck with the generated flashcards
+        const updateFilter: UpdateFilter<DeckDocument> = {
+            $set: {
+                updatedAt: new Date(),
+                flashcards: flashcardsObject  // Store the entire JSON object
+            }
+        };
         const result = await collection.updateOne(
             { userId, flashcardId: deckName },
             updateFilter,
-            { upsert: true }  // This will insert the document if it doesn't exist
+            { upsert: true }
         );
 
         if (result.modifiedCount > 0 || result.upsertedCount > 0) {
