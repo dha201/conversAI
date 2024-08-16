@@ -1,14 +1,18 @@
 import React, { useState, useRef } from 'react';
 import Image from 'next/image';
 import { toast } from "@/app/components/ui/use-toast";
+import { text } from 'stream/consumers';
 
 interface CreateFlashcardProps {
     deckName: string | null; 
+    userId: string | null;
 }
 
-const CreateFlashcard = ({ deckName }: CreateFlashcardProps) => {
+const CreateFlashcard = ({ deckName, userId }: CreateFlashcardProps) => {
     const [selectedInput, setSelectedInput] = useState<'link' | 'document' | 'text'>('link');
     const [file, setFile] = useState<File | null>(null);
+    const [textInput, setTextInput] = useState<string>('');
+    const [linkInput, setLinkInput] = useState<string>('');
     const [isLoading, setIsLoading] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -17,37 +21,110 @@ const CreateFlashcard = ({ deckName }: CreateFlashcardProps) => {
         setSelectedInput(type);
     };
 
-    const handleUpload = async (file: File) => {
-        if (file) {
-            setIsLoading(true);
-            const formData = new FormData();
-            formData.append('pdf', file);
+    const handleGenerateContent = () => {
+        if (selectedInput === 'document' && file) {
+            handleGenerateKeywords(file, deckName ?? '', userId ?? '');
+        } else if (selectedInput === 'text') {
+            console.log('Text Input:', textInput && textInput);
+            handleUpload(textInput);
+            handleGenerateKeywords(textInput, deckName ?? '', userId ?? '');
+        } else if (selectedInput === 'link') {
+            handleGenerateKeywords(selectedInput, deckName ?? '', userId ?? '');
+        }
+    };
 
-            try {
-                const response = await fetch('/api/embed-pdf', {
-                    method: 'POST',
-                    body: formData,
-                });
-            
-                if (response.ok) {
-                    console.log('PDF uploaded and embedded successfully');
-                    // You can add additional logic here, like updating the chat context
-                    toast({
-                        title: "Upload Successful",
-                        description: "Knowledge base updated. The AI is now equipped to handle queries about your uploaded document.",
-                        variant: "default",
-                    });
-                }
-            } catch (error) {
-                console.error('Error uploading and embedding PDF:', error);
+    const handleGenerateKeywords = async (input: File | string, deckName: string, userId: string) => {
+        const formData = new FormData();
+    
+        if (input instanceof File) {
+            formData.append('pdf', input);
+        } else {
+            formData.append('text', input);
+        }
+    
+        formData.append('deckName', deckName);
+        formData.append('userId', userId);
+
+        try {
+            const response = await fetch('/api/generateKeywords', {
+                method: 'POST',
+                body: formData,
+            });
+    
+            if (response.ok) {
                 toast({
-                    title: "Upload Failed",
-                    description: "There was an error uploading your PDF.",
-                    variant: "destructive",
+                    title: "Keywords Generated",
+                    description: "Keywords generated from the provided content.",
+                    variant: "default",
                 });
-            } finally {
-            setIsLoading(false);
+            } else {
+                throw new Error("Failed to generate keywords");
             }
+        } catch (error) {
+            console.error('Error generating keywords:', error);
+            toast({
+                title: "Keyword Generation Failed",
+                description: "There was an error generating keywords from your content.",
+                variant: "destructive",
+            });
+        }
+    };
+    
+    const handleLinkSubmit = () => {
+        console.log('Link Input:', linkInput);
+        // Handle link submission logic here
+    };
+
+    const handleUpload = async (input: string | File) => {
+        setIsLoading(true);
+        const formData = new FormData();
+        let endpoint = '/api/embed-pdf';
+        
+        if (typeof input === 'string') {
+            formData.append('content', input);
+        } else if (input instanceof File) {
+            formData.append('pdf', input);
+        } else {
+            throw new Error("Invalid input type");
+        }
+    
+        try {
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                body: formData,
+            });
+    
+            if (response.ok) {
+                console.log('Content uploaded and embedded successfully');
+    
+                /* if (input instanceof File) {
+                    // Make the second API call to generate keywords only for PDF files
+                    const keywordResponse = await fetch('/api/generateKeywords', {
+                        method: 'POST',
+                        body: formData,
+                    });
+                } */
+    
+                toast({
+                    title: "Upload Successful",
+                    description: typeof input === 'string' 
+                        ? "Knowledge base updated with the provided text."
+                        : "Knowledge base updated. The AI is now equipped to handle queries about your uploaded document.",
+                    variant: "default",
+                });
+
+            } else {
+                throw new Error("Failed to upload content");
+            }
+        } catch (error) {
+            console.error('Error uploading and embedding content:', error);
+            toast({
+                title: "Upload Failed",
+                description: "There was an error uploading your content.",
+                variant: "destructive",
+            });
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -103,6 +180,8 @@ const CreateFlashcard = ({ deckName }: CreateFlashcardProps) => {
                         <input
                         type="text"
                         placeholder="https://www.conversAI.com"
+                        value={linkInput}
+                        onChange={(e) => setLinkInput(e.target.value)}
                         className="w-4/5 p-2 mr-4 text-lg border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
                         />
                     )}
@@ -135,12 +214,16 @@ const CreateFlashcard = ({ deckName }: CreateFlashcardProps) => {
 
                     {selectedInput === 'text' && (
                         <textarea
-                        placeholder="Enter your text here"
-                        className="w-4/5 p-2 mr-4 text-lg border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                            placeholder="Enter your text here"
+                            value={textInput}
+                            onChange={(e) => setTextInput(e.target.value)}
+                            className="w-4/5 p-2 mr-4 text-lg border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
                         />
                     )}
 
-                    <button className="px-4 py-2 text-lg font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-700">
+                    <button 
+                        onClick={handleGenerateContent}
+                        className="px-4 py-2 text-lg font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-700">
                         Generate Content
                     </button>
                 </div>

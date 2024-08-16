@@ -24,7 +24,7 @@ export default function CreateFlashcardPage() {
         <Stepper activeStep={activeStep} setActiveStep={setActiveStep} />
 
         {activeStep === 0 && <CreateStep userId={userId} setDeckName={setDeckName} setActiveStep={setActiveStep} />} 
-        {activeStep === 1 && <CreateFlashcard deckName={deckName} />}
+        {activeStep === 1 && <CreateFlashcard userId={userId} deckName={deckName} />}
       </div>
     </div>
   );

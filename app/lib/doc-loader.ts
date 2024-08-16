@@ -6,10 +6,11 @@ import { Document } from "langchain/document";
 export async function getChunkedDocsFromPDF(file: File) {
   try {
     const blob = new Blob([file], { type: file.type });
-    const loader = new PDFLoader(blob);
+    const loader = new PDFLoader(blob); // Parse PDF content into structured text for processing.
     const docs = await loader.load();
 
     // From the docs https://www.pinecone.io/learn/chunking-strategies/
+    // splitting text into manageable chunks for processing in LLM
     const textSplitter = new RecursiveCharacterTextSplitter({
       chunkSize: 500,
       chunkOverlap: 100,
