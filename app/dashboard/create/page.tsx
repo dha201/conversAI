@@ -1,12 +1,12 @@
-// /app/dashboard/create/page.tsx
 'use client';
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Stepper from '@/app/components/Stepper';
 import CreateStep from '@/app/components/CreateStep';
 import CreateFlashcard from '@/app/components/createFlashcard';
+import { withAuth } from '@/app/utils/withAuth';
 
-export default function CreateFlashcardPage() {
+function CreateFlashcardPage() {
   const [activeStep, setActiveStep] = useState(0);
   const [userId, setUserId] = useState<string | null>(null);
   const searchParams = useSearchParams();
@@ -29,3 +29,5 @@ export default function CreateFlashcardPage() {
     </div>
   );
 }
+
+export default withAuth(CreateFlashcardPage);

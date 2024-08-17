@@ -1,3 +1,4 @@
+// app/api/getAllChat/route.ts
 import { NextResponse } from 'next/server';
 import { MongoClient } from 'mongodb';
 
@@ -14,15 +15,15 @@ export async function GET(request: Request) {
 
     try {
         await client.connect();
-        const database = client.db('chatbotDB');
-        const collection = database.collection('conversations');
+        const database = client.db('flashcardDB');
+        const collection = database.collection('decks');
 
         // Find all conversations for the given userId
-        const conversations = await collection.find({ userId }).sort({ conversationId: -1 }).toArray();
+        const decks = await collection.find({ userId }).toArray();
 
-        if (conversations.length > 0) {
-            console.log('All Conversations:', conversations);
-            return NextResponse.json(conversations, { status: 200 });
+        if (decks.length > 0) {
+            console.log('All Conversations:', decks);
+            return NextResponse.json(decks, { status: 200 });
         } else {
             return NextResponse.json({ message: 'No conversations found for this user' }, { status: 404 });
         }

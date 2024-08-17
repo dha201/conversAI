@@ -15,6 +15,10 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const { userId } = useAuth();
   const router = useRouter();
 
+  /**
+   * Fetch all conversationId from MongoDB, which are used to render the list of conversations.
+   * 
+   */
   const fetchAllConversations = async () => {
     if (!userId) return;
 
@@ -38,6 +42,9 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  /**
+   * Creating new chat in MongoDB and returns a new conversationId. Which is then used to pass down as props to the chat page.
+   */
   const handleNewChat = async (e: React.MouseEvent) => {
     e.preventDefault();
     if (!userId) return;
@@ -83,6 +90,10 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     router.push(`/dashboard/create?userId=${userId}`);
   };
 
+  const handledefaultDashboardClick = () => {
+    router.push(`/dashboard/flashcards`);
+  };
+
   return (
     <div className="flex flex-col h-screen">
       <TopNav />
@@ -90,6 +101,31 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
       <div className="flex flex-1 overflow-hidden pt-16">
         <nav className="w-1/6 h-[calc(100vh-4rem)] bg-white text-slate-900 fixed left-0 top-16 pt-4">
           <ul className="flex flex-col space-y-4 p-4 ml-5">
+            {/* Route to default /dashboard page for decks */}
+            <li className="hover:bg-gray-200 p-2 rounded flex items-center">
+              <button
+                onClick={handledefaultDashboardClick}
+                className="flex items-center w-full"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-6 h-6 mr-2"
+                >
+                  <path
+                    d="M12 3V21M3 12H21"
+                    stroke="#000000"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  ></path>
+                </svg>
+                Flashcards
+              </button>
+            </li>
+
+            {/* On click handler to navigate to new chat page */}
             <li className="hover:bg-gray-200 p-2 rounded flex items-center">
               <button
                 onClick={handleCreateFlashcardClick}
@@ -112,7 +148,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                 Create Flashcard
               </button>
             </li>
-
+            {/*  */}
             <li className="hover:bg-gray-200 p-2 rounded flex items-center">
               <button
                 onClick={handleNewChat}
