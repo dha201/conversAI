@@ -67,3 +67,27 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* styles.css */
+.mic-on {
+  color: green;
+  border: 2px solid green;
+  background-color: #f0fff0;
+  transition: background-color 0.3s ease;
+}
+
+.mic-off {
+  color: red;
+  border: 2px solid red;
+  background-color: #fff0f0;
+  transition: background-color 0.3s ease;
+}
+
+/* Optional: Add a hover effect for better UX */
+.mic-on:hover {
+  background-color: #d0ffd0;
+}
+
+.mic-off:hover {
+  background-color: #ffd0d0;
+}
