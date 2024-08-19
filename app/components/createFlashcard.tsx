@@ -92,7 +92,6 @@ const CreateFlashcard = ({ deckName, userId }: CreateFlashcardProps) => {
     const handleUpload = async (input: string | File) => {
         setIsLoading(true);
         const formData = new FormData();
-        let endpoint = '/api/embed-pdf';
         
         if (typeof input === 'string') {
             formData.append('content', input);
@@ -103,21 +102,13 @@ const CreateFlashcard = ({ deckName, userId }: CreateFlashcardProps) => {
         }
     
         try {
-            const response = await fetch(endpoint, {
+            const response = await fetch('/api/embed-pdf', {
                 method: 'POST',
                 body: formData,
             });
     
             if (response.ok) {
                 console.log('Content uploaded and embedded successfully');
-    
-                /* if (input instanceof File) {
-                    // Make the second API call to generate keywords only for PDF files
-                    const keywordResponse = await fetch('/api/generateKeywords', {
-                        method: 'POST',
-                        body: formData,
-                    });
-                } */
     
                 toast({
                     title: "Upload Successful",

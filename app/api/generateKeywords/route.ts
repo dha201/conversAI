@@ -30,7 +30,7 @@ export async function POST(req: Request) {
         });
 
         const formData = await req.formData();
-        console.log('Received formData from generateKeywords:', formData);
+        console.log('From /generateKeywords, Received formData:', formData);
 
         const file = formData.get('pdf');
         const rawText = formData.get('text');
