@@ -15,11 +15,14 @@ const convertNewLines = (text: string) =>
     </span>
   ));
 
-interface ChatBubbleProps extends Partial<Message> {}
+interface ChatBubbleProps extends Partial<Message> {
+  createdAt?: Date; // Use createdAt for the timestamp
+}
 
 export function ChatBubble({
   role = "assistant",
   content,
+  createdAt,
 }: ChatBubbleProps) {
   if (!content) {
     return null;
@@ -29,21 +32,22 @@ export function ChatBubble({
   return (
     <div>
       <Card className="mb-2">
-        {/* Main container for the chat bubble */}
-        {/* Header section displaying who the message is from (AI or You) */}
         <CardHeader>
-            <CardTitle
-                className={
-                role != "assistant"
-                    ? "text-amber-500 dark:text-amber-200"
-                    : "text-blue-500 dark:text-blue-200"
-                }
-            >
-                {role == "assistant" ? "AI" : "You"}
-            </CardTitle>
+          <CardTitle
+            className={
+              role !== "assistant"
+                ? "text-amber-500 dark:text-amber-200"
+                : "text-blue-500 dark:text-blue-200"
+            }
+          >
+            {role === "assistant" ? "AI" : "You"}
+          </CardTitle>
+          {createdAt && (
+            <div className="text-xs text-gray-500 dark:text-gray-400">
+              {new Date(createdAt).toLocaleString()} {/* Format timestamp */}
+            </div>
+          )}
         </CardHeader>
-
-        {/* Content section displaying the formatted message */}
         <CardContent className="text-sm">
           <Balancer>{formattedMessage}</Balancer>
         </CardContent>
