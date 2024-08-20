@@ -4,6 +4,7 @@ import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Icon from '@/data/icon.png';
+import { Button } from './ui/button';
 
 
 export function TopNav() {
@@ -33,7 +34,12 @@ export function TopNav() {
           </SignInButton>
         </SignedOut>
         <SignedIn>
-          <UserButton />
+          <div className='flex items-center space-x-4'>
+            <Button variant='white' onClick={() => router.push('/subscription')} className="hover:text-gray-300 ">
+              Subscription
+            </Button>
+            <UserButton />
+          </div>
         </SignedIn>
       </div>
     </nav>

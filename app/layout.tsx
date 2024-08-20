@@ -6,7 +6,7 @@ import { ClerkProvider } from '@clerk/nextjs';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata = {
-  title: 'AI Chatbot',
+  title: 'conversAI',
   description: '--',
   icons: [{ rel: 'icon', url: '/favicon.ico' }],
 };
