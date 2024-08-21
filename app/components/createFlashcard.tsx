@@ -81,11 +81,11 @@ const CreateFlashcard = ({ deckName, userId }: CreateFlashcardProps) => {
 
         } catch (error) {
             console.error('Error generating keywords:', error);
-            toast({
+            /* toast({
                 title: "Keyword Generation Failed",
                 description: "There was an error generating keywords from your content.",
                 variant: "destructive",
-            });
+            }); */
         } finally {
             setIsLoading2(false);
         }
