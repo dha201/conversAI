@@ -133,11 +133,11 @@ const CreateFlashcard = ({ deckName, userId }: CreateFlashcardProps) => {
             }
         } catch (error) {
             console.error('Error uploading and embedding content:', error);
-            toast({
+            /* toast({
                 title: "Upload Failed",
                 description: "There was an error uploading your content.",
                 variant: "destructive",
-            });
+            }); */
         } finally {
             setIsLoading(false);
         }

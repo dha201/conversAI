@@ -35,11 +35,11 @@ const PDFUploader: React.FC = () => {
         }
       } catch (error) {
         console.error('Error uploading and embedding PDF:', error);
-        toast({
+        /* toast({
           title: "Upload Failed",
           description: "There was an error uploading your PDF.",
           variant: "destructive",
-        });
+        }); */
       } finally {
         setIsLoading(false);
       }
