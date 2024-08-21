@@ -2,6 +2,8 @@ import React, { useState, useRef } from 'react';
 import Image from 'next/image';
 import { toast } from "@/app/components/ui/use-toast";
 import { text } from 'stream/consumers';
+import { useRouter } from 'next/navigation';
+
 
 interface CreateFlashcardProps {
     deckName: string ; 
@@ -14,7 +16,9 @@ const CreateFlashcard = ({ deckName, userId }: CreateFlashcardProps) => {
     const [textInput, setTextInput] = useState<string>('');
     const [linkInput, setLinkInput] = useState<string>('');
     const [isLoading, setIsLoading] = useState(false);
+    const [isLoading2, setIsLoading2] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const router = useRouter();
 
 
     const handleInputTypeClick = (type: 'link' | 'document' | 'text') => {
@@ -46,7 +50,8 @@ const CreateFlashcard = ({ deckName, userId }: CreateFlashcardProps) => {
      */
     const handleGenerateKeywords = async (input: File | string, deckName: string, userId: string) => {
         const formData = new FormData();
-    
+        setIsLoading2(true);
+        
         if (input instanceof File) {
             formData.append('pdf', input);
         } else {
@@ -71,6 +76,9 @@ const CreateFlashcard = ({ deckName, userId }: CreateFlashcardProps) => {
             } else {
                 throw new Error("Failed to generate keywords");
             }
+
+            router.push('/dashboard/flashcards');
+
         } catch (error) {
             console.error('Error generating keywords:', error);
             toast({
@@ -78,6 +86,8 @@ const CreateFlashcard = ({ deckName, userId }: CreateFlashcardProps) => {
                 description: "There was an error generating keywords from your content.",
                 variant: "destructive",
             });
+        } finally {
+            setIsLoading2(false);
         }
     };
     
@@ -148,7 +158,6 @@ const CreateFlashcard = ({ deckName, userId }: CreateFlashcardProps) => {
     };
 
     return (
-        <div className="h-full p-6 overflow-y-auto flex-grow flex flex-col gap-4 items-center justify-center bg-slate-50">
             <div className="w-11/12 max-w-2xl p-8 bg-white rounded-lg shadow-lg">
 
                 <p className="mb-8 text-sm text-gray-600">
@@ -231,13 +240,20 @@ const CreateFlashcard = ({ deckName, userId }: CreateFlashcardProps) => {
 
                     <button 
                         onClick={handleGenerateContent}
-                        className="px-4 py-2 text-lg font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-700">
-                        Generate Content
+                        className="px-4 py-2 text-lg font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-700"
+                    >
+                        {isLoading2 ? (
+                            <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                        ) : (
+                            'Generate Content'
+                        )}
                     </button>
                 </div>
 
             </div>
-        </div>
     );
 };
 

@@ -4,7 +4,7 @@ import { TopNav } from '@/app/components/topNav';
 import { withAuth } from '@/app/utils/withAuth';
 import { Toaster } from "@/app/components/ui/toaster";
 import { Flashcard } from '@/app/components/flashcard';
-import { useAuth } from '@clerk/nextjs';
+import { useAuth, useUser } from '@clerk/nextjs';
 
 interface FlashcardData {
   _id: string;
@@ -18,6 +18,7 @@ interface FlashcardData {
 
 function DecksPage() {
   const { userId } = useAuth();
+  const { user } = useUser();
   const [conversations, setConversations] = useState<FlashcardData[]>([]);
 
   // Fetch all flashcard decks
@@ -59,11 +60,11 @@ function DecksPage() {
       
       {/* Header Section */}
       <div className="p-8 text-left">
-        <h1 className="text-2xl font-semibold">Hi, username</h1>
+        <h1 className="text-2xl font-semibold">Hi, {user!.firstName}</h1>
         <p className="text-gray-500">You&apos;ve got this!</p>
       </div>
 
-      <div className="flex flex-1 justify-center items-center">
+      <div className="p-8">
         <div className="flex flex-wrap gap-4">
           {conversations.map((conversation) => (
             <Flashcard
@@ -77,11 +78,11 @@ function DecksPage() {
           ))}
 
           {/* Floating Action Button */}
-          <button className="ml-8 bg-gray-300 rounded-full w-20 h-20 flex items-center justify-center shadow-lg">
+          {/* <button className="ml-8 bg-gray-300 rounded-full w-20 h-20 flex items-center justify-center shadow-lg">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-10 h-10">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
             </svg>
-          </button>
+          </button> */}
         </div>
       </div>
     </div>

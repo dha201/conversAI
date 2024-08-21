@@ -48,7 +48,7 @@ export default function CreateStep({ userId, setDeckName, setActiveStep  }: Crea
         body: JSON.stringify({
           userId: userId,
           deckName: deckName,
-          color: selectedColor.name,
+          color: selectedColor.color,
           description: description,
         }),
       });

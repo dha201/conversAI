@@ -27,6 +27,7 @@ const FlashcardPage = () => {
     const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
     const [flashcardId, setFlashcardId] = useState<string | null>(null);
     const [userId, setUserId] = useState<string | null>(null);
+    const [color, setColor] = useState<string>('white');
 
     useEffect(() => {
         // Get the query parameters from the URL
@@ -49,16 +50,22 @@ const FlashcardPage = () => {
 
                     if (response.ok) {
                         const data = await response.json();
-                        console.log('All Conversations received:', data);
+                        console.log('Deck information received:', data);
 
-                        const flashcardArray: Flashcard[] = Object.keys(data).flatMap((key) => {
-                            return data[key].map((q: any) => ({
-                                question: q.front,
-                                answer: q.back,
-                            }));
-                        });
+                        if (data.color) {
+                            setColor(data.color);
+                        }
 
-                        setFlashcards(flashcardArray);
+                        if (data.flashcards) {
+                            const flashcardArray: Flashcard[] = Object.keys(data.flashcards).flatMap((key) => {
+                                return data.flashcards[key].map((q: any) => ({
+                                    question: q.front,
+                                    answer: q.back,
+                                }));
+                            });
+
+                            setFlashcards(flashcardArray);
+                        }
                     } else {
                         console.error('Failed to fetch conversations:', response.statusText);
                     }
@@ -96,37 +103,37 @@ const FlashcardPage = () => {
 
     return (
         <div className="flex justify-center items-center h-screen">
-        <div className="relative flex items-center justify-center w-full max-w-md mx-auto">
-            {/* Previous Button */}
-            <button
-            onClick={handlePrev}
-            className="absolute left-[-3rem] text-3xl bg-gray-200 hover:bg-gray-300 rounded-full p-2 shadow-lg"
-            >
-            &lt;
-            </button>
+            <div className="relative flex items-center justify-center w-full max-w-md mx-auto">
+                {/* Previous Button */}
+                <button
+                    onClick={handlePrev}
+                    className="absolute left-[-3rem] text-3xl bg-gray-200 hover:bg-gray-300 rounded-full p-2 shadow-lg"
+                    >
+                    &lt;
+                </button>
 
-            {/* Flashcard */}
-            <div
-            onClick={handleFlip}
-            className={`bg-gray-200 w-full p-8 rounded-lg shadow-lg text-center cursor-pointer transition-transform duration-500 transform ${
-                isFlipped ? 'rotate-y-180' : ''
-            }`}
-            >
-            <h2 className="text-xl font-semibold">
-                {isFlipped
-                ? flashcards[currentIndex].answer
-                : flashcards[currentIndex].question}
-            </h2>
+                {/* Flashcard */}
+                <div
+                    onClick={handleFlip}
+                    className={`bg-gray-200 w-full p-8 rounded-lg shadow-lg text-center cursor-pointer transition-transform duration-500 transform ${
+                        isFlipped ? 'rotate-y-180' : ''
+                    }`}
+                >
+                    <h2 className="text-xl font-semibold">
+                        {isFlipped
+                        ? flashcards[currentIndex].answer
+                        : flashcards[currentIndex].question}
+                    </h2>
+                </div>
+
+                {/* Next Button */}
+                <button
+                    onClick={handleNext}
+                    className="absolute right-[-3rem] text-3xl bg-gray-200 hover:bg-gray-300 rounded-full p-2 shadow-lg"
+                >
+                    &gt;
+                </button>
             </div>
-
-            {/* Next Button */}
-            <button
-            onClick={handleNext}
-            className="absolute right-[-3rem] text-3xl bg-gray-200 hover:bg-gray-300 rounded-full p-2 shadow-lg"
-            >
-            &gt;
-            </button>
-        </div>
         </div>
     );
 };

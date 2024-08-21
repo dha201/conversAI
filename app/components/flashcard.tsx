@@ -18,7 +18,7 @@ export const Flashcard: React.FC<FlashcardProps> = ({ flashcardId, userId, title
 
   return (
     <Link href={href}>
-      <div className={`bg-${color.toLowerCase()}-400 w-60 h-32 rounded-lg shadow-lg p-4 relative cursor-pointer`}>
+      <div className={`${color} w-60 h-32 rounded-lg shadow-lg p-4 relative cursor-pointer`}>
         <h2 className="font-semibold text-lg">{title}</h2>
         <p className="text-gray-500 text-xs mt-2">{description}</p>
         

@@ -31,9 +31,9 @@ export async function GET(request: Request) {
         });
 
         if (data) {
-            const questions = data.flashcards || [];
-            console.log('Data being sent back: ', questions);
-            return NextResponse.json(questions, { status: 200 });
+            //const questions = data.flashcards || [];
+            //console.log('Data being sent back: ', questions);
+            return NextResponse.json(data, { status: 200 });
         } else {
             return NextResponse.json({ message: 'Conversation not found' }, { status: 404 });
         }
