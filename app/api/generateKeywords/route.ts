@@ -120,10 +120,10 @@ export async function POST(req: Request) {
                 },
                 {
                     role: 'user',
-                    content: `Here is the context: ${context}. `,
+                    content: `Here is the context: ${context}. Generate 20 flashcards based on this content.`,
                 },
             ],
-            temperature: 0.9,
+            temperature: 0.5,
         });
 
         const flashcardsJson = response.choices[0].message?.content?.trim();
