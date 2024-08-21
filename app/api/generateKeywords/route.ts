@@ -1,13 +1,14 @@
 import { NextResponse } from 'next/server';
-import { MongoClient, UpdateFilter } from 'mongodb';  // Importing UpdateFilter
+import { UpdateFilter } from 'mongodb'; 
 import { OpenAI } from 'openai';
 import { getVectorStore } from '@/app/lib/vector-store';
 import { getPinecone } from '@/app/lib/pinecone-client';
 import { Document } from "langchain/document";
 import { getChunkedDocsFromPDF, getChunkedDocsFromText } from '@/app/lib/doc-loader';
+import { connectToFlashcardDB } from '@/app/lib/mongodb-client-flashcard';
 
-const uri = process.env.MONGODB_URI as string;
-const client = new MongoClient(uri);
+/* const uri = process.env.MONGODB_URI as string;
+const client = new MongoClient(uri); */
 
 // Flashcard interface
 interface Flashcard {
@@ -32,7 +33,7 @@ export async function POST(req: Request) {
         const formData = await req.formData();
         console.log('From /generateKeywords, Received formData:', formData);
 
-        const file = formData.get('pdf');
+        // const file = formData.get('pdf');
         const rawText = formData.get('text');
         const userId = formData.get('userId') as string;
         const deckName = formData.get('deckName') as string;
@@ -42,22 +43,26 @@ export async function POST(req: Request) {
         }
 
         let chunkedDocs: Document[] = [];
-        let extractedContent = '';
+        let extractedContent = rawText;
 
-        // Check for input data
-        if (file && file instanceof Blob) {
+        // Check for input data then chunk the document content
+        /* if (file && file instanceof Blob) {
             console.log('Processing file input...');
-            chunkedDocs = await getChunkedDocsFromPDF(file);
+            extractedContent = rawText;
+            // chunkedDocs = await getChunkedDocsFromPDF(file);
         } else if (typeof rawText === 'string') {
             console.log('Processing text input...');
-            chunkedDocs = await getChunkedDocsFromText(rawText);
+            extractedContent = rawText;
+            // chunkedDocs = await getChunkedDocsFromText(rawText);
         } else {
             console.error('No valid input provided');
             throw new Error('No valid input provided');
-        }
+        } */
+
 
         // Combine the chunked document content into a single string
-        extractedContent = chunkedDocs.map(doc => doc.pageContent).join(' ');
+        // extractedContent = chunkedDocs.map(doc => doc.pageContent).join(' ');
+        console.log('Combined document content:', extractedContent);
 
         // Generate summary or keywords using OpenAI
         const keywords = await openai.chat.completions.create({
@@ -143,9 +148,8 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Failed to parse flashcards JSON' }, { status: 500 });
         } */
 
-        await client.connect();
-        const database = client.db('flashcardDB');
-        const collection = database.collection<DeckDocument>('decks');
+        const db = await connectToFlashcardDB();
+        const collection = db.collection<DeckDocument>('decks');
 
         // Update the existing deck with the generated flashcards
         const updateFilter: UpdateFilter<DeckDocument> = {
@@ -170,7 +174,5 @@ export async function POST(req: Request) {
     } catch (e: any) {
         console.error(e);
         return new Response(JSON.stringify({ error: e.message }), { status: e.status ?? 500 });
-    } finally {
-        await client.close();
     }
 }

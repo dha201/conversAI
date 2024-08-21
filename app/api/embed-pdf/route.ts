@@ -66,25 +66,12 @@ export async function POST(request: Request) {
       }
     }
 
-    // Edge Case: Handle raw JSON/Text input
-    /* else if (contentType.includes('application/json') || contentType.includes('text/plain')) {
-      const body = await request.json();
-      
-      // Check if we received plain text or JSON structure
-      const inputText = typeof body === 'string' ? body : JSON.stringify(body);
-
-      chunks = await getChunkedDocsFromText(inputText);
-      
-    } else {
-      return NextResponse.json({ error: 'Unsupported content type' }, { status: 400 });
-    } */
-
-    ////////////////////
-
     if (!chunks || chunks.length === 0) {
       return NextResponse.json({ error: 'No content to embed' }, { status: 400 });
     }
 
+    // Combine the chunked document content into a single string
+    const extractedContent = chunks.map(doc => doc.pageContent).join(' ');
 
     // Embed and store the chunks
     try {
@@ -93,7 +80,7 @@ export async function POST(request: Request) {
       console.error('Error embedding content:', error);
       return NextResponse.json({ error: 'Failed to embed content' }, { status: 500 });
     }
-    return NextResponse.json({ message: 'Content embedded successfully' });
+    return NextResponse.json({ message: 'Content embedded successfully', extractedContent }, { status: 200 });
 
   } catch (error) {
     console.error('Error embedding content:', error);

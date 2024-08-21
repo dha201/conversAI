@@ -19,6 +19,7 @@ const CreateFlashcard = ({ deckName, userId }: CreateFlashcardProps) => {
     const [isLoading2, setIsLoading2] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const router = useRouter();
+    const [extractedContent, setExtractedContent] = useState<string | null>(null); 
 
 
     const handleInputTypeClick = (type: 'link' | 'document' | 'text') => {
@@ -30,7 +31,8 @@ const CreateFlashcard = ({ deckName, userId }: CreateFlashcardProps) => {
      */
     const handleGenerateContent = () => {
         if (selectedInput === 'document' && file) {
-            handleGenerateKeywords(file, deckName, userId);
+            // handleGenerateKeywords(file, deckName, userId);
+            handleGenerateKeywords(extractedContent!, deckName, userId);
         } else if (selectedInput === 'text') {
             console.log('Text Input:', textInput && textInput);
             handleUpload(textInput);
@@ -57,7 +59,6 @@ const CreateFlashcard = ({ deckName, userId }: CreateFlashcardProps) => {
         } else {
             formData.append('text', input);
         }
-    
         formData.append('deckName', deckName);
         formData.append('userId', userId);
 
@@ -119,6 +120,9 @@ const CreateFlashcard = ({ deckName, userId }: CreateFlashcardProps) => {
     
             if (response.ok) {
                 console.log('Content uploaded and embedded successfully');
+                const data = await response.json();
+                const { extractedContent } = data;
+                console.log('Chunked Content:', extractedContent);
     
                 toast({
                     title: "Upload Successful",
@@ -127,6 +131,8 @@ const CreateFlashcard = ({ deckName, userId }: CreateFlashcardProps) => {
                         : "Knowledge base updated. The AI is now equipped to handle queries about your uploaded document.",
                     variant: "default",
                 });
+
+                setExtractedContent(extractedContent);
 
             } else {
                 throw new Error("Failed to upload content");

@@ -1,9 +1,6 @@
 // app/api/getAllChat/route.ts
 import { NextResponse } from 'next/server';
-import { MongoClient } from 'mongodb';
-
-const uri = process.env.MONGODB_URI as string;
-const client = new MongoClient(uri);
+import { connectToFlashcardDB } from '@/app/lib/mongodb-client-flashcard';
 
 export async function GET(request: Request) {
     const url = new URL(request.url);
@@ -14,9 +11,8 @@ export async function GET(request: Request) {
     }
 
     try {
-        await client.connect();
-        const database = client.db('flashcardDB');
-        const collection = database.collection('decks');
+        const db = await connectToFlashcardDB();
+        const collection = db.collection('decks');
 
         // Find all conversations for the given userId
         const decks = await collection.find({ userId }).toArray();
@@ -30,7 +26,5 @@ export async function GET(request: Request) {
     } catch (error) {
         console.error('Error retrieving conversations:', error);
         return NextResponse.json({ error: 'Error retrieving conversations' }, { status: 500 });
-    } finally {
-        await client.close();
     }
 }

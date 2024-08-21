@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { MongoClient } from 'mongodb';
+import { connectToFlashcardDB } from '@/app/lib/mongodb-client-flashcard';
 
 const uri = process.env.MONGODB_URI as string;
 const client = new MongoClient(uri);
@@ -21,9 +22,8 @@ export async function GET(request: Request) {
     }
 
     try {
-        await client.connect();
-        const database = client.db('flashcardDB');
-        const collection = database.collection('decks');
+        const db = await connectToFlashcardDB();
+        const collection = db.collection('decks');
 
         const data = await collection.findOne({
             flashcardId: flashcardId,

@@ -16,15 +16,16 @@ const client = new MongoClient(uri, {
 
 let isConnected = false;
 
-export async function connectToDatabase() {
+export async function connectToFlashcardDB() {
   if (!isConnected) {
     try {
       await client.connect();
       isConnected = true;
+      console.log('Connected to MongoDB');
     } catch (err) {
       console.error('Failed to connect to the database', err);
       throw err;
     }
   }
-  return client.db("chatbot");
+  return client.db("chatbotDB");
 }

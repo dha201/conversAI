@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
-import { MongoClient } from 'mongodb';
+// import { MongoClient } from 'mongodb';
+import { connectToFlashcardDB } from '@/app/lib/mongodb-client-flashcard';
 
-const uri = process.env.MONGODB_URI as string;
-const client = new MongoClient(uri);
+
+/* const uri = process.env.MONGODB_URI as string;
+const client = new MongoClient(uri); */
 
 export async function POST(request: Request) {
     try {
@@ -17,9 +19,8 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
 
-        await client.connect();
-        const database = client.db('flashcardDB');
-        const collection = database.collection('decks');
+        const db = await connectToFlashcardDB();
+        const collection = db.collection('decks');
 
         // Check if the deck with the same name already exists for the user
         const existingDeck = await collection.findOne({ userId, flashcardId: deckName });
@@ -48,7 +49,5 @@ export async function POST(request: Request) {
     } catch (error) {
         console.error('Error creating new deck:', error);
         return NextResponse.json({ error: 'Error creating new deck' }, { status: 500 });
-    } finally {
-        await client.close();
     }
 }
