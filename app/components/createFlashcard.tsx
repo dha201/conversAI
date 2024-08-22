@@ -8,6 +8,19 @@ interface CreateFlashcardProps {
     userId: string;
 }
 
+const MAX_CHAR_LIMIT = 100000;
+const splitTextIntoChunks = (text: string, chunkSize: number): string[] => {
+    const chunks = [];
+    let currentIndex = 0;
+
+    while (currentIndex < text.length) {
+        chunks.push(text.slice(currentIndex, currentIndex + chunkSize));
+        currentIndex += chunkSize;
+    }
+
+    return chunks;
+};
+
 const CreateFlashcard = ({ deckName, userId }: CreateFlashcardProps) => {
     const [selectedInput, setSelectedInput] = useState<'link' | 'document' | 'text'>('link');
     const [file, setFile] = useState<File | null>(null);
@@ -48,35 +61,55 @@ const CreateFlashcard = ({ deckName, userId }: CreateFlashcardProps) => {
      * Pass in context to OpenAI to generate a list of flashcard questions and answers.
      * Store it in the mongoDB for later retrieval. 
      */
-    const handleGenerateKeywords = async (input: File | string, deckName: string, userId: string) => {
+    const handleGenerateKeywords = async (input: string, deckName: string, userId: string) => {
         const formData = new FormData();
         setIsLoading2(true);
         
-        if (input instanceof File) {
-            formData.append('pdf', input);
-        } else {
-            formData.append('text', input);
-        }
+        /* formData.append('text', input);
         formData.append('deckName', deckName);
-        formData.append('userId', userId);
+        formData.append('userId', userId); */
+        
+        // KEEP TRACK AND  SET A LIMIT TO TO 200,000 CHARACTERS MAX
 
         try {
-            // Generate Keywords
-            const keywordResponse = await fetch('/api/generateKeywords', {
-                method: 'POST',
-                body: formData,
-            });
     
-            if (!keywordResponse.ok) {
-                throw new Error("Failed to generate keywords");
+            // set a limit to how mucch text can be processed at once
+            const chunks = splitTextIntoChunks(input, 50000);
+            let totalProcessedCharacters = 0;
+            const keywordsList: string[] = [];
+
+            // Generate Keywords using a for...of loop to respect the character limit and handle async calls sequentially
+            for (const chunk of chunks) {
+                // Ensure that the total processed characters do not exceed the limit
+                if (totalProcessedCharacters + chunk.length > MAX_CHAR_LIMIT) {
+                    break;  // Stop processing if adding this chunk exceeds the character limit
+                }
+
+                totalProcessedCharacters += chunk.length;
+
+                const chunkFormData = new FormData();
+                chunkFormData.append('text', chunk);
+
+                // Generate Keywords for each chunk
+                const keywordResponse = await fetch('/api/generateKeywords', {
+                    method: 'POST',
+                    body: chunkFormData,
+                });
+
+                if (!keywordResponse.ok) {
+                    throw new Error("Failed to generate keywords for a chunk");
+                }
+
+                const { keywords } = await keywordResponse.json();
+                keywordsList.push(keywords);
             }
-            const { keywords } = await keywordResponse.json();
-            console.log('Generated Keywords:', keywords);
+
+            console.log('Combined keywords list:', keywordsList);
 
             // Retrieve Relevant Documents from Pinecone
             const documentResponse = await fetch('/api/retrieveDoc', {
                 method: 'POST',
-                body: JSON.stringify({ keywords }),
+                body: JSON.stringify({ keywordsList }),
                 headers: {
                     'Content-Type': 'application/json'
                 }

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { OpenAI } from 'openai';
 
-function summarizeText(text: string, maxTokens: number): string {
+/* function summarizeText(text: string, maxTokens: number): string {
     // Basic implementation to summarize text, you can improve this with libraries like 'summarizer'
     const sentences = text.split('. ');
     
@@ -13,7 +13,7 @@ function summarizeText(text: string, maxTokens: number): string {
     
     // Extract the top sentences
     return sentences.slice(0, sentenceLimit).join('. ') + '.';
-}
+} */
 
 
 export async function POST(req: Request) {
@@ -31,7 +31,7 @@ export async function POST(req: Request) {
             throw new Error("No text provided");
         }
 
-        const summarizedText = summarizeText(rawText, 128000); // Limit to 128,000 tokens
+        //const summarizedText = summarizeText(rawText, 128000); // Limit to 128,000 tokens
 
         // Generate summary or keywords using OpenAI
         const keywords = await openai.chat.completions.create({
@@ -43,7 +43,7 @@ export async function POST(req: Request) {
                 },
                 {
                     role: 'user',
-                    content: `Extract keywords from this content: ${summarizedText}`,
+                    content: `Extract keywords from this content: ${rawText}`,
                 },
             ],
             temperature: 0.1,

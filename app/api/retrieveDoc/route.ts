@@ -4,15 +4,18 @@ import { getPinecone } from '@/app/lib/pinecone-client';
 
 export async function POST(req: Request) {
     try {
-        const { keywords } = await req.json();
+        const { keywordsList  } = await req.json();
 
-        if (!keywords) {
+        if (!keywordsList ) {
             return NextResponse.json({ error: 'Missing keywords' }, { status: 400 });
         }
+        
+        // Join the array elements into a single string, without newlines
+        const combinedKeywords = keywordsList.join(' ');
 
         const pineconeClient = await getPinecone();
         const vectorStore = await getVectorStore(pineconeClient);
-        const relevantDocs = await vectorStore.asRetriever().invoke(keywords);
+        const relevantDocs = await vectorStore.asRetriever().invoke(combinedKeywords);
         const context = relevantDocs.map(doc => doc.pageContent).join("\n");
 
         if (!context) {
