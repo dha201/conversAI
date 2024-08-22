@@ -75,27 +75,42 @@ const CreateFlashcard = ({ deckName, userId }: CreateFlashcardProps) => {
             console.log('Generated Keywords:', keywords);
 
             // Pass the keywords to the flashcard generation backend
-            const response = await fetch('/api/generateFlashcards', {
+            const flashcardResponse = await fetch('/api/generateFlashcards', {
                 method: 'POST',
-                body: JSON.stringify({ deckName, userId, keywords }),
+                body: JSON.stringify({ keywords }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+           
+            if (!flashcardResponse.ok) {
+                throw new Error("Failed to generate flashcards");
+            }
+
+            const { flashcards } = await flashcardResponse.json();
+
+            // Update Flashcards in Database
+            const updateResponse = await fetch('/api/updateFlashcards', {
+                method: 'POST',
+                body: JSON.stringify({ deckName, userId, flashcards }),
                 headers: {
                     'Content-Type': 'application/json'
                 }
             });
 
-            if (response.ok) {
+            if (updateResponse.ok) {
                 toast({
-                    title: "Keywords Generated",
-                    description: "Keywords generated from the provided content.",
+                    title: "Keywords and Flashcards Generated",
+                    description: "Keywords and flashcards generated and saved successfully.",
                     variant: "default",
                 });
                 router.push('/dashboard/flashcards');
             } else {
-                throw new Error("Failed to generate flashcards");
+                throw new Error("Failed to update flashcards in the database");
             }
 
         } catch (error) {
-            console.error('Error generating keywords:', error);
+            console.error('Error generating Flashcards:', error);
             /* toast({
                 title: "Keyword Generation Failed",
                 description: "There was an error generating keywords from your content.",

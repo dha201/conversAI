@@ -11,23 +11,15 @@ interface Flashcard {
     back: string;
 }
 
-// DeckDocument interface that includes flashcards as an array of Flashcard
-interface DeckDocument {
-    userId: string;
-    flashcardId: string;
-    updatedAt: Date;
-    flashcards: Flashcard[] | Record<string, Flashcard[]>;  // Allow either array or object format
-}
-
 export async function POST(req: Request) {
     try {
         const openai = new OpenAI({
             apiKey: process.env.OPENAI_API_KEY!,
         });
 
-        const { keywords, userId, deckName } = await req.json();
+        const { keywords } = await req.json();
 
-        if (!userId || !deckName || !keywords) {
+        if (!keywords) {
             return NextResponse.json({ error: 'Missing userId, deckName, or keywords' }, { status: 400 });
         }
 
@@ -89,28 +81,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Failed to parse flashcards JSON' }, { status: 500 });
         }
 
-        const db = await connectToFlashcardDB();
-        const collection = db.collection<DeckDocument>('decks');
-
-        // Update the existing deck with the generated flashcards
-        const updateFilter: UpdateFilter<DeckDocument> = {
-            $set: {
-                updatedAt: new Date(),
-                flashcards: flashcardsObject  // Store the entire JSON object
-            }
-        };
-        const result = await collection.updateOne(
-            { userId, flashcardId: deckName },
-            updateFilter,
-            { upsert: true }
-        );
-
-        if (result.modifiedCount > 0 || result.upsertedCount > 0) {
-            console.log('Deck updated with new flashcards');
-            return NextResponse.json({ success: true }, { status: 200 });
-        } else {
-            return NextResponse.json({ error: 'Failed to update deck with flashcards' }, { status: 500 });
-        }
+        return NextResponse.json({ flashcards: flashcardsObject, success: true }, { status: 200 });
 
     } catch (e: any) {
         console.error(e);
