@@ -98,8 +98,8 @@ const CreateFlashcard = ({ deckName, userId }: CreateFlashcardProps) => {
 
                 if (!keywordResponse.ok) {
                     toast({
-                        title: "Something went wrong",
-                        description: "PLease try again.",
+                        title: "File too large",
+                        description: "Please use a file under 1,100 KB.",
                         variant: "default",
                     });
                 }
@@ -131,7 +131,11 @@ const CreateFlashcard = ({ deckName, userId }: CreateFlashcardProps) => {
             });
            
             if (!flashcardResponse.ok) {
-                throw new Error("Failed to generate flashcards");
+                toast({
+                    title: "File too large",
+                    description: "Please use a file under 1,100 KB.",
+                    variant: "default",
+                });
             }
 
             const { flashcards } = await flashcardResponse.json();
@@ -218,7 +222,11 @@ const CreateFlashcard = ({ deckName, userId }: CreateFlashcardProps) => {
                         });
                         setExtractedContent(extractedContent);
                     } else {
-                        throw new Error("Failed to embed chunks");
+                        toast({
+                            title: "File too large",
+                            description: "Please use a file under 1,100 KB.",
+                            variant: "default",
+                        });
                     }
                 } catch (embedError) {
                     console.error('Error embedding and storing content:', embedError);
