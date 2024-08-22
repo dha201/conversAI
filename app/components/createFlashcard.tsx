@@ -74,7 +74,7 @@ const CreateFlashcard = ({ deckName, userId }: CreateFlashcardProps) => {
         try {
     
             // set a limit to how mucch text can be processed at once
-            const chunks = splitTextIntoChunks(input, 50000);
+            const chunks = splitTextIntoChunks(input, 30000);
             let totalProcessedCharacters = 0;
             const keywordsList: string[] = [];
 
