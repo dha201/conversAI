@@ -51,7 +51,7 @@ export async function POST(req: Request) {
                 },
                 {
                     role: 'user',
-                    content: `Here is the context: ${context}. Generate 20 flashcards based on this content.`,
+                    content: `Here is the context: ${context}. Generate 10 flashcards based on this content.`,
                 },
             ],
             temperature: 0.5,

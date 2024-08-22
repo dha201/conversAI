@@ -8,7 +8,7 @@ interface CreateFlashcardProps {
     userId: string;
 }
 
-const MAX_CHAR_LIMIT = 100000;
+const MAX_CHAR_LIMIT = 80000;
 const splitTextIntoChunks = (text: string, chunkSize: number): string[] => {
     const chunks = [];
     let currentIndex = 0;
@@ -74,7 +74,7 @@ const CreateFlashcard = ({ deckName, userId }: CreateFlashcardProps) => {
         try {
     
             // set a limit to how mucch text can be processed at once
-            const chunks = splitTextIntoChunks(input, 30000);
+            const chunks = splitTextIntoChunks(input, 25000);
             let totalProcessedCharacters = 0;
             const keywordsList: string[] = [];
 
@@ -97,7 +97,11 @@ const CreateFlashcard = ({ deckName, userId }: CreateFlashcardProps) => {
                 });
 
                 if (!keywordResponse.ok) {
-                    throw new Error("Failed to generate keywords for a chunk");
+                    toast({
+                        title: "Something went wrong",
+                        description: "PLease try again.",
+                        variant: "default",
+                    });
                 }
 
                 const { keywords } = await keywordResponse.json();
