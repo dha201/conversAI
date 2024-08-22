@@ -8,7 +8,7 @@ interface CreateFlashcardProps {
     userId: string;
 }
 
-const MAX_CHAR_LIMIT = 100000;
+const MAX_CHAR_LIMIT = 50000;
 const splitTextIntoChunks = (text: string, chunkSize: number): string[] => {
     const chunks = [];
     let currentIndex = 0;
@@ -74,7 +74,7 @@ const CreateFlashcard = ({ deckName, userId }: CreateFlashcardProps) => {
         try {
     
             // set a limit to how mucch text can be processed at once
-            const chunks = splitTextIntoChunks(input, 30000);
+            const chunks = splitTextIntoChunks(input, 50000);
             let totalProcessedCharacters = 0;
             const keywordsList: string[] = [];
 
@@ -107,8 +107,6 @@ const CreateFlashcard = ({ deckName, userId }: CreateFlashcardProps) => {
                 const { keywords } = await keywordResponse.json();
                 keywordsList.push(keywords);
             }
-
-            console.log('Combined keywords list:', keywordsList);
 
             // Retrieve Relevant Documents from Pinecone
             const documentResponse = await fetch('/api/retrieveDoc', {

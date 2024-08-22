@@ -1,9 +1,5 @@
 import { NextResponse } from 'next/server';
 import { OpenAI } from 'openai';
-import { getVectorStore } from '@/app/lib/vector-store';
-import { getPinecone } from '@/app/lib/pinecone-client';
-import { connectToFlashcardDB } from '@/app/lib/mongodb-client-flashcard';
-import { UpdateFilter } from 'mongodb';
 
 // Flashcard interface
 interface Flashcard {
@@ -12,6 +8,8 @@ interface Flashcard {
 }
 
 export async function POST(req: Request) {
+    const encoder = new TextEncoder();
+
     try {
         const openai = new OpenAI({
             apiKey: process.env.OPENAI_API_KEY!,
@@ -51,7 +49,7 @@ export async function POST(req: Request) {
                 },
                 {
                     role: 'user',
-                    content: `Here is the context: ${context}. Generate 15 flashcards based on this content.`,
+                    content: `Here is the context: ${context}. Generate 10 flashcards based on this content.`,
                 },
             ],
             temperature: 0.5,
