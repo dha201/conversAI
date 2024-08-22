@@ -20,13 +20,39 @@ const PDFUploader: React.FC = () => {
       formData.append('pdf', file);
 
       try {
-        const response = await fetch('/api/embed-pdf', {
+        const response = await fetch('/api/chunk-doc', {
           method: 'POST',
           body: formData,
         });
         if (response.ok) {
-          console.log('PDF uploaded and embedded successfully');
-          // You can add additional logic here, like updating the chat context
+          const data = await response.json();
+          const { extractedContent, chunks } = data;         
+          // Embed and store the chunks
+          try {
+            const embedResponse = await fetch('/api/embed-chunks', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chunks }),
+            });
+
+            if (embedResponse.ok) {
+                toast({
+                    title: "Upload Successful",
+                    description: "Knowledge base updated. The AI is now equipped to handle queries about your uploaded document.",
+                    variant: "default",
+                });
+            } else {
+                throw new Error("Failed to embed chunks");
+            }
+          } catch (embedError) {
+              console.error('Error embedding and storing content:', embedError);
+              toast({
+                  title: "Embedding Failed",
+                  description: "There was an error embedding your content.",
+                  variant: "destructive",
+              });
+          }
+
           toast({
             title: "Upload Successful",
             description: "Knowledge base updated. The AI is now equipped to handle queries about your uploaded document.",

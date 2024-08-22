@@ -1,7 +1,5 @@
 import React, { useState, useRef } from 'react';
-import Image from 'next/image';
 import { toast } from "@/app/components/ui/use-toast";
-import { text } from 'stream/consumers';
 import { useRouter } from 'next/navigation';
 
 
@@ -63,22 +61,38 @@ const CreateFlashcard = ({ deckName, userId }: CreateFlashcardProps) => {
         formData.append('userId', userId);
 
         try {
-            const response = await fetch('/api/generateKeywords', {
+            // Generate Keywords
+            const keywordResponse = await fetch('/api/generateKeywords', {
                 method: 'POST',
                 body: formData,
             });
     
+            if (!keywordResponse.ok) {
+                throw new Error("Failed to generate keywords");
+            }
+
+            const { keywords } = await keywordResponse.json();
+            console.log('Generated Keywords:', keywords);
+
+            // Pass the keywords to the flashcard generation backend
+            const response = await fetch('/api/generateFlashcards', {
+                method: 'POST',
+                body: JSON.stringify({ deckName, userId, keywords }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
             if (response.ok) {
                 toast({
                     title: "Keywords Generated",
                     description: "Keywords generated from the provided content.",
                     variant: "default",
                 });
+                router.push('/dashboard/flashcards');
             } else {
-                throw new Error("Failed to generate keywords");
+                throw new Error("Failed to generate flashcards");
             }
-
-            router.push('/dashboard/flashcards');
 
         } catch (error) {
             console.error('Error generating keywords:', error);
@@ -113,7 +127,7 @@ const CreateFlashcard = ({ deckName, userId }: CreateFlashcardProps) => {
         }
     
         try {
-            const response = await fetch('/api/embed-pdf', {
+            const response = await fetch('/api/chunk-doc', {
                 method: 'POST',
                 body: formData,
             });
@@ -121,18 +135,37 @@ const CreateFlashcard = ({ deckName, userId }: CreateFlashcardProps) => {
             if (response.ok) {
                 console.log('Content uploaded and embedded successfully');
                 const data = await response.json();
-                const { extractedContent } = data;
+                const { extractedContent, chunks } = data;
                 console.log('Chunked Content:', extractedContent);
-    
-                toast({
-                    title: "Upload Successful",
-                    description: typeof input === 'string' 
-                        ? "Knowledge base updated with the provided text."
-                        : "Knowledge base updated. The AI is now equipped to handle queries about your uploaded document.",
-                    variant: "default",
-                });
 
-                setExtractedContent(extractedContent);
+                // Embed and store the chunks
+                try {
+                    const embedResponse = await fetch('/api/embed-chunks', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ chunks }),
+                    });
+    
+                    if (embedResponse.ok) {
+                        toast({
+                            title: "Upload Successful",
+                            description: typeof input === 'string' 
+                                ? "Knowledge base updated with the provided text."
+                                : "Knowledge base updated. The AI is now equipped to handle queries about your uploaded document.",
+                            variant: "default",
+                        });
+                        setExtractedContent(extractedContent);
+                    } else {
+                        throw new Error("Failed to embed chunks");
+                    }
+                } catch (embedError) {
+                    console.error('Error embedding and storing content:', embedError);
+                    toast({
+                        title: "Embedding Failed",
+                        description: "There was an error embedding your content.",
+                        variant: "destructive",
+                    });
+                }
 
             } else {
                 throw new Error("Failed to upload content");

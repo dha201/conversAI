@@ -41,7 +41,7 @@ export async function POST(request: Request) {
         try {  
           // Process PDF file
           const file = fileEntry as File;
-          console.log('Embedding file...');
+          console.log('Processing file...');
           chunks = await getChunkedDocsFromPDF(file);
           console.log(`PDF processed into ${chunks.length} chunks`);
         } catch (error) {
@@ -53,7 +53,7 @@ export async function POST(request: Request) {
         const textContent  = textEntry.toString();
         try { 
           // Process text input
-          console.log('Embedding text...');
+          console.log('Processing text...');
           chunks = await getChunkedDocsFromText(textContent);
           console.log(`Text processed into ${chunks.length} chunks`);
         } catch (error) {
@@ -74,13 +74,13 @@ export async function POST(request: Request) {
     const extractedContent = chunks.map(doc => doc.pageContent).join(' ');
 
     // Embed and store the chunks
-    try {
+    /* try {
       await embedAndStoreDocs(pineconeClient, chunks);
     } catch (error) {
       console.error('Error embedding content:', error);
       return NextResponse.json({ error: 'Failed to embed content' }, { status: 500 });
-    }
-    return NextResponse.json({ message: 'Content embedded successfully', extractedContent }, { status: 200 });
+    } */
+    return NextResponse.json({ message: 'Content embedded successfully', extractedContent, chunks }, { status: 200 });
 
   } catch (error) {
     console.error('Error embedding content:', error);
