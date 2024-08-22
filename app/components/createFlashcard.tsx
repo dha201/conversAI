@@ -70,14 +70,26 @@ const CreateFlashcard = ({ deckName, userId }: CreateFlashcardProps) => {
             if (!keywordResponse.ok) {
                 throw new Error("Failed to generate keywords");
             }
-
             const { keywords } = await keywordResponse.json();
             console.log('Generated Keywords:', keywords);
+
+            // Retrieve Relevant Documents from Pinecone
+            const documentResponse = await fetch('/api/retrieveDoc', {
+                method: 'POST',
+                body: JSON.stringify({ keywords }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            if (!documentResponse.ok) {
+                throw new Error("Failed to retrieve documents");
+            }
+            const { context } = await documentResponse.json();
 
             // Pass the keywords to the flashcard generation backend
             const flashcardResponse = await fetch('/api/generateFlashcards', {
                 method: 'POST',
-                body: JSON.stringify({ keywords }),
+                body: JSON.stringify({ context  }),
                 headers: {
                     'Content-Type': 'application/json'
                 }

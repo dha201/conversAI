@@ -17,17 +17,7 @@ export async function POST(req: Request) {
             apiKey: process.env.OPENAI_API_KEY!,
         });
 
-        const { keywords } = await req.json();
-
-        if (!keywords) {
-            return NextResponse.json({ error: 'Missing userId, deckName, or keywords' }, { status: 400 });
-        }
-
-        // Initialize Pinecone and Vector Store, then extract relevant data
-        const pineconeClient = await getPinecone();
-        const vectorStore = await getVectorStore(pineconeClient);
-        const relevantDocs = await vectorStore.asRetriever().invoke(keywords);
-        const context = relevantDocs.map(doc => doc.pageContent).join("\n");
+        const { context } = await req.json();
 
         if (!context) {
             throw new Error('Failed to load context data');
